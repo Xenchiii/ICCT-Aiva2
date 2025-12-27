@@ -1,70 +1,465 @@
-import { useState } from 'react';
-import { BookOpen, Users, MessageCircle, Calendar, Search, Star, Bell, Moon, Sun, Home, User, Settings, FileText, Award, TrendingUp, Clock, CheckCircle, Heart, Download } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-const styles=`@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.animate-fadeIn{animation:fadeIn .3s ease-out}.animate-pulse{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}.bg-gray-750{background-color:#2d3748}.bg-gray-650{background-color:#4a5568}.hover\\:bg-gray-750:hover{background-color:#2d3748}.transition-all{transition:all .3s ease}`;
-if(typeof document!=='undefined'){const s=document.createElement("style");s.textContent=styles;document.head.appendChild(s)}
+// Import components
+import AuthForm from './components/auth/AuthForm';
+import GoogleCallback from './components/auth/GoogleCallback';
+import Navbar from './components/shared/Navbar';
+import Sidebar from './components/shared/Sidebar';
+import Classes from './components/dashboard/Classes';
 
-interface User{id:string;name:string;email:string;role:'student'|'tutor'|'admin';department:string;avatar:string;rating?:number;reviews?:number;experience?:string;subjects?:string[];isOnline?:boolean;badges?:string[];points?:number}
+// Import dashboards
+import StudentDashboard from './components/dashboard/StudentDashboard';
+import TeacherDashboard from './components/dashboard/TeacherDashboard';
+import AdminDashboard from './components/dashboard/AdminDashboard';
 
-const departments=['BSCS','BSIT','BSIS','BUSINESS','PSYCHOLOGY','CRIMINOLOGY','EDUCATION','LAW','COOKERY','GENERAL ACADEMIC','LIFE SKILLS','ACCOUNTANCY','ENGINEERING','ARCHITECTURE'];
-const teachers:User[]=[{id:'1',name:'Sir Joriz D. Chiong',email:'joriz.chiong@icctutor.com',role:'tutor',department:'CCS',avatar:'/api/placeholder/50/50',rating:5.0,reviews:0,experience:'CCS Teacher',subjects:['Computer Science'],isOnline:false,badges:['CCS Faculty'],points:0},{id:'2',name:'Sir Daither Dongcoy',email:'daither.dongcoy@icctutor.com',role:'tutor',department:'CCS',avatar:'/api/placeholder/50/50',rating:5.0,reviews:0,experience:'CCS Teacher',subjects:['Computer Science'],isOnline:false,badges:['CCS Faculty'],points:0},{id:'3',name:'Miss Jenny Bautista',email:'jenny.bautista@icctutor.com',role:'tutor',department:'EDUCATION',avatar:'/api/placeholder/50/50',rating:5.0,reviews:0,experience:'Education Teacher',subjects:['Education'],isOnline:false,badges:['Education Faculty'],points:0},{id:'4',name:'Miss Mara Caratao',email:'mara.caratao@icctutor.com',role:'tutor',department:'EDUCATION',avatar:'/api/placeholder/50/50',rating:5.0,reviews:0,experience:'Education Teacher',subjects:['Education'],isOnline:false,badges:['Education Faculty'],points:0},{id:'5',name:'Sir Glen Dela Cruz',email:'glen.delacruz@icctutor.com',role:'tutor',department:'MASS COMMUNICATION',avatar:'/api/placeholder/50/50',rating:5.0,reviews:0,experience:'Mass Communication Teacher',subjects:['Mass Communication'],isOnline:false,badges:['Mass Comm Faculty'],points:0}];
+// Import teacher components
+import TeacherStudents from './components/teacher/TeacherStudents';
+import TeacherClasses from './components/teacher/TeacherClasses';
+import TeacherAnalytics from './components/teacher/TeacherAnalytics';
 
-export default function ICCTutorSystem(){
-  const[currentUser]=useState<User>({id:'student1',name:'Student User',email:'student@icctutor.com',role:'student',department:'BSCS',avatar:'/api/placeholder/50/50',badges:['New Student'],points:0});
-  const[activeTab,setActiveTab]=useState('dashboard');
-  const[darkMode,setDarkMode]=useState(false);
-  const[searchQuery,setSearchQuery]=useState('');
-  const[selectedDepartment,setSelectedDepartment]=useState('ALL');
-  const[notifications,setNotifications]=useState([{id:'1',message:'Welcome to ICCTutor!',time:'Just now'}]);
-  const[showNotifications,setShowNotifications]=useState(false);
-  const[sessions,setSessions]=useState<Array<{id:string;teacher:string;date:string;time:string;subject:string}>>([]);
-  const[messages,setMessages]=useState<Array<{id:string;sender:string;message:string;time:string}>>([]);
-  const[selectedConversation,setSelectedConversation]=useState<string|null>(null);
-  const[newMessage,setNewMessage]=useState('');
-  const[sidebarCollapsed,setSidebarCollapsed]=useState(false);
-  const[teacherFilter,setTeacherFilter]=useState('ALL');
-  const[uploadedFiles,setUploadedFiles]=useState<Array<{id:string;name:string;type:string;size:string;uploadedBy:string;date:string}>>([]);
+// Import student components
+import Badges from './components/student/Badges';
+import Gamification from './components/student/Gamification';
+import Resources from './components/student/Resources';
+import Messages from './components/student/Messages';
+import Games from './components/student/Games';
+import Profile from './components/student/Profile';
+import Teachers from './components/student/Teachers';
+import StudentActivities from './components/student/StudentActivities';
 
-  const bookSession=(teacherId:string)=>{const teacher=teachers.find(t=>t.id===teacherId);if(teacher){setSessions([...sessions,{id:Date.now().toString(),teacher:teacher.name,date:new Date().toLocaleDateString(),time:'2:00 PM',subject:teacher.subjects?.[0]||'General'}]);addNotification(`Session booked with ${teacher.name}!`)}};
-  const addNotification=(message:string)=>{setNotifications([{id:Date.now().toString(),message,time:'Just now'},...notifications])};
-  const sendMessage=()=>{if(newMessage.trim()&&selectedConversation){setMessages([...messages,{id:Date.now().toString(),sender:currentUser.name,message:newMessage,time:new Date().toLocaleTimeString()}]);setNewMessage('')}};
+// Import modals
+import SettingsModal from './components/modals/SettingsModal';
+
+// API Base URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8787/api';
+
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: 'student' | 'teacher' | 'admin';
+  level?: number;
+  points?: number;
+  streak?: number;
+  studentNo?: string;
+  course?: string;
+  teacherNo?: string;
+  avatar_url?: string;
+}
+
+interface NotificationItem {
+  id: string;
+  message: string;
+  time: string;
+  read: boolean;
+}
+
+// Main App Content Component (Wrapper for authenticated content)
+function AppContent() {
+  // Auth state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   
-  const handleFileUpload=(event:React.ChangeEvent<HTMLInputElement>)=>{
-    const files=event.target.files;
-    if(files&&files.length>0){
-      Array.from(files).forEach(file=>{
-        const newFile={
-          id:Date.now().toString()+Math.random(),
-          name:file.name,
-          type:file.type,
-          size:(file.size/1024/1024).toFixed(2)+'MB',
-          uploadedBy:currentUser.name,
-          date:new Date().toLocaleDateString()
-        };
-        setUploadedFiles(prev=>[newFile,...prev]);
-        addNotification(`File "${file.name}" uploaded successfully!`);
+  // UI state
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [darkMode, setDarkMode] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  
+  // Data state
+  const [badges, setBadges] = useState<any[]>([]);
+  const [challenges, setChallenges] = useState<any[]>([]);
+  const [rewards, setRewards] = useState<any[]>([]);
+  const [teachers, setTeachers] = useState<any[]>([]);
+  const [resources, setResources] = useState<any[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  
+  // Teacher-specific state
+  const [students, setStudents] = useState<any[]>([]);
+  const [classes, setClasses] = useState<any[]>([]);
+  const [assignments, setAssignments] = useState<any[]>([]);
+  const [analytics, setAnalytics] = useState<any>({});
+  
+  // Modal states
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+
+  // Check for existing session on component mount
+  useEffect(() => {
+    const token = sessionStorage.getItem('auth_token');
+    const userData = sessionStorage.getItem('user_data');
+    
+    if (token && userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        setCurrentUser(parsedUser);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Failed to parse user data:', error);
+        sessionStorage.removeItem('auth_token');
+        sessionStorage.removeItem('user_data');
+      }
+    }
+  }, []);
+
+  // API helper function
+  const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
+    try {
+      const token = sessionStorage.getItem('auth_token');
+      const headers: any = {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        ...options,
+        headers,
       });
-      event.target.value='';
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Request failed');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
     }
   };
 
-  const renderContent=()=>{
-    if(activeTab==='dashboard')return<div className="space-y-6 animate-fadeIn"><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">{[{label:'Total Books',value:'0',color:'blue',icon:BookOpen},{label:'Available Teachers',value:teachers.length.toString(),color:'green',icon:Users},{label:'Study Points',value:currentUser.points?.toString()||'0',color:'purple',icon:TrendingUp},{label:'Your Badges',value:(currentUser.badges?.length||0).toString(),color:'orange',icon:Award}].map((stat,i)=><div key={i} className={`p-6 rounded-xl ${darkMode?'bg-gray-800 hover:bg-gray-750':'bg-white hover:bg-gray-50'} shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 cursor-pointer`}><div className="flex items-center justify-between"><div><p className={`text-sm ${darkMode?'text-gray-400':'text-gray-600'}`}>{stat.label}</p><p className={`text-2xl font-bold text-${stat.color}-600`}>{stat.value}</p></div><div className={`bg-${stat.color}-100 p-3 rounded-full`}><stat.icon className={`h-8 w-8 text-${stat.color}-600`}/></div></div></div>)}</div><div className={`p-6 rounded-xl ${darkMode?'bg-gray-800':'bg-white'} shadow-lg`}><h3 className="text-lg font-semibold mb-4">Quick Actions</h3><div className="grid grid-cols-2 md:grid-cols-4 gap-4">{[{tab:'teachers',label:'Find Teachers',icon:Users},{tab:'resources',label:'Browse Books',icon:BookOpen},{tab:'calendar',label:'Schedule',icon:Calendar},{tab:'notes',label:'My Notes',icon:FileText}].map((action,i)=><button key={i} onClick={()=>setActiveTab(action.tab)} className={`p-4 rounded-lg ${darkMode?'bg-gray-700 hover:bg-gray-600':'bg-gray-50 hover:bg-gray-100'} transition-colors flex flex-col items-center space-y-2`}><action.icon className="h-6 w-6 text-blue-600"/><span className="text-sm font-medium">{action.label}</span></button>)}</div></div><div className={`p-6 rounded-xl ${darkMode?'bg-gray-800':'bg-white'} shadow-lg`}><div className="flex items-center justify-between mb-4"><h3 className="text-lg font-semibold">Featured Teachers</h3><button onClick={()=>setActiveTab('teachers')} className="text-blue-600 hover:text-blue-700 text-sm font-medium">View All →</button></div><div className="grid grid-cols-1 md:grid-cols-3 gap-4">{teachers.slice(0,3).map(teacher=><div key={teacher.id} className={`p-4 border rounded-lg ${darkMode?'border-gray-700':'border-gray-200'} hover:shadow-md transition-all`}><div className="flex items-center space-x-3 mb-3"><img src={teacher.avatar} alt={teacher.name} className="w-12 h-12 rounded-full"/><div className="flex-1"><h4 className="font-medium">{teacher.name}</h4><p className={`text-sm ${darkMode?'text-gray-400':'text-gray-600'}`}>{teacher.department}</p><div className="flex items-center space-x-1 mt-1"><Star className="h-3 w-3 text-yellow-500 fill-current"/><span className="text-xs">{teacher.rating}</span></div></div></div><div className="flex space-x-2"><button onClick={()=>{setSelectedConversation(teacher.id);setActiveTab('messages')}} className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">Message</button><button onClick={()=>bookSession(teacher.id)} className="flex-1 px-3 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700">Book</button></div></div>)}</div></div>{sessions.length>0&&<div className={`p-6 rounded-xl ${darkMode?'bg-gray-800':'bg-white'} shadow-lg`}><h3 className="text-lg font-semibold mb-4">Recent Sessions</h3><div className="space-y-3">{sessions.slice(0,3).map(session=><div key={session.id} className={`flex items-center p-3 rounded-lg ${darkMode?'bg-gray-700':'bg-gray-50'}`}><CheckCircle className="h-5 w-5 text-green-600 mr-3"/><div><p className="font-medium">{session.subject} with {session.teacher}</p><p className={`text-sm ${darkMode?'text-gray-400':'text-gray-600'}`}>{session.date} at {session.time}</p></div></div>)}</div></div>}</div>;
-
-    if(activeTab==='resources')return<div className="space-y-6 animate-fadeIn"><div className={`p-4 rounded-xl ${darkMode?'bg-gray-800':'bg-white'} shadow-lg`}><div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4"><div className="flex-1 relative"><Search className="absolute left-3 top-3 h-4 w-4 text-gray-400"/><input type="text" placeholder="Search books..." value={searchQuery} onChange={(e)=>setSearchQuery(e.target.value)} className={`pl-10 pr-4 py-2 w-full border rounded-lg ${darkMode?'bg-gray-700 border-gray-600 text-white':'bg-white border-gray-300'} focus:outline-none focus:ring-2 focus:ring-blue-500`}/></div><select value={selectedDepartment} onChange={(e)=>setSelectedDepartment(e.target.value)} className={`px-4 py-2 border rounded-lg ${darkMode?'bg-gray-700 border-gray-600 text-white':'bg-white border-gray-300'}`}><option value="ALL">All Departments</option>{departments.map(dept=><option key={dept} value={dept}>{dept}</option>)}</select></div></div><div className={`p-8 rounded-xl ${darkMode?'bg-gray-800':'bg-white'} shadow-lg text-center`}><div className={`w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center ${darkMode?'bg-gray-700':'bg-gray-100'}`}><BookOpen className={`h-12 w-12 ${darkMode?'text-gray-500':'text-gray-400'}`}/></div><h3 className="text-xl font-semibold mb-2">No Resources Available Yet</h3><p className={`mb-6 ${darkMode?'text-gray-400':'text-gray-600'}`}>We're working on adding learning materials!</p><button onClick={()=>addNotification('You will be notified')} className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Notify Me</button></div></div>;
-
-    if(activeTab==='teachers'){const filtered=teacherFilter==='ALL'?teachers:teachers.filter(t=>t.department===teacherFilter);return<div className="space-y-6 animate-fadeIn"><div className={`p-4 rounded-xl ${darkMode?'bg-gray-800':'bg-white'} shadow-lg`}><select value={teacherFilter} onChange={(e)=>setTeacherFilter(e.target.value)} className={`px-4 py-2 border rounded-lg ${darkMode?'bg-gray-700 border-gray-600 text-white':'bg-white border-gray-300'}`}>{['ALL','CCS','EDUCATION','MASS COMMUNICATION'].map(d=><option key={d} value={d}>{d==='ALL'?'All Departments':d}</option>)}</select></div><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{filtered.map(teacher=><div key={teacher.id} className={`p-6 rounded-xl ${darkMode?'bg-gray-800':'bg-white'} shadow-lg hover:shadow-2xl transition-all hover:scale-105`}><div className="flex items-start space-x-4 mb-4"><img src={teacher.avatar} alt={teacher.name} className="w-16 h-16 rounded-full ring-2 ring-blue-500"/><div className="flex-1"><h3 className="font-semibold text-lg">{teacher.name}</h3><p className={`text-sm ${darkMode?'text-gray-400':'text-gray-600'}`}>{teacher.department}</p><div className="flex items-center mt-1">{[...Array(5)].map((_,i)=><Star key={i} className={`h-4 w-4 ${i<Math.floor(teacher.rating||0)?'text-yellow-500 fill-current':'text-gray-300'}`}/>)}</div></div></div><div className="flex space-x-2"><button onClick={()=>{setSelectedConversation(teacher.id);setActiveTab('messages');addNotification(`Started chat with ${teacher.name}`)}} className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center justify-center"><MessageCircle className="h-4 w-4 mr-1"/>Message</button><button onClick={()=>bookSession(teacher.id)} className="flex-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center justify-center"><Calendar className="h-4 w-4 mr-1"/>Book</button></div></div>)}</div></div>}
-
-    if(activeTab==='notes')return<div className="space-y-6 animate-fadeIn"><div className={`p-4 rounded-xl ${darkMode?'bg-gray-800':'bg-white'} shadow-lg`}><div className="flex justify-between items-center"><h2 className="text-xl font-semibold">Study Notes</h2><button onClick={()=>addNotification('Note creation coming soon!')} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center"><FileText className="h-4 w-4 mr-2"/>Create Note</button></div></div><div className={`p-8 rounded-xl ${darkMode?'bg-gray-800':'bg-white'} shadow-lg text-center`}><div className={`w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center ${darkMode?'bg-gray-700':'bg-gray-100'}`}><FileText className={`h-12 w-12 ${darkMode?'text-gray-500':'text-gray-400'}`}/></div><h3 className="text-xl font-semibold mb-2">No Study Notes Yet</h3><p className={`mb-6 ${darkMode?'text-gray-400':'text-gray-600'}`}>Start creating notes to organize your materials!</p></div></div>;
-
-    if(activeTab==='messages'){const convos=teachers.map(t=>({id:t.id,name:t.name,avatar:t.avatar}));const selTeacher=teachers.find(t=>t.id===selectedConversation);return<div className="flex h-[600px] rounded-xl overflow-hidden shadow-lg"><div className={`w-1/3 ${darkMode?'bg-gray-800':'bg-white'} border-r ${darkMode?'border-gray-700':'border-gray-200'}`}><div className={`p-4 border-b ${darkMode?'border-gray-700':'border-gray-200'}`}><h3 className="font-semibold">Messages</h3></div><div className="overflow-y-auto h-[calc(100%-70px)]">{convos.map(c=><button key={c.id} onClick={()=>setSelectedConversation(c.id)} className={`w-full p-4 flex items-center space-x-3 ${selectedConversation===c.id?(darkMode?'bg-gray-700':'bg-blue-50'):(darkMode?'hover:bg-gray-700':'hover:bg-gray-50')}`}><img src={c.avatar} alt={c.name} className="w-12 h-12 rounded-full"/><div className="flex-1 text-left"><h4 className="font-medium">{c.name}</h4><p className={`text-sm ${darkMode?'text-gray-400':'text-gray-600'}`}>Click to chat</p></div></button>)}</div></div><div className={`flex-1 ${darkMode?'bg-gray-800':'bg-white'} flex flex-col`}>{selectedConversation&&selTeacher?<><div className={`p-4 border-b ${darkMode?'border-gray-700':'border-gray-200'}`}><h4 className="font-semibold">{selTeacher.name}</h4></div><div className={`flex-1 p-4 overflow-y-auto ${darkMode?'bg-gray-900':'bg-gray-50'}`}>{messages.filter(m=>m.sender===selTeacher.name||m.sender===currentUser.name).length===0?<div className="flex items-center justify-center h-full"><div className="text-center"><MessageCircle className={`h-16 w-16 mx-auto mb-4 ${darkMode?'text-gray-600':'text-gray-400'}`}/><p className={darkMode?'text-gray-400':'text-gray-600'}>Start chatting with {selTeacher.name}</p></div></div>:<div className="space-y-4">{messages.filter(m=>m.sender===selTeacher.name||m.sender===currentUser.name).map(msg=><div key={msg.id} className={`flex ${msg.sender===currentUser.name?'justify-end':'justify-start'}`}><div className={`max-w-xs px-4 py-2 rounded-lg ${msg.sender===currentUser.name?'bg-blue-600 text-white':(darkMode?'bg-gray-700 text-white':'bg-white text-gray-900')}`}><p>{msg.message}</p><p className={`text-xs mt-1 ${msg.sender===currentUser.name?'text-blue-100':(darkMode?'text-gray-400':'text-gray-500')}`}>{msg.time}</p></div></div>)}</div>}</div><div className={`p-4 border-t ${darkMode?'border-gray-700':'border-gray-200'}`}><div className="flex space-x-2"><input type="text" value={newMessage} onChange={(e)=>setNewMessage(e.target.value)} onKeyPress={(e)=>e.key==='Enter'&&sendMessage()} placeholder="Type a message..." className={`flex-1 px-4 py-2 border rounded-lg ${darkMode?'bg-gray-700 border-gray-600 text-white':'bg-white border-gray-300'} focus:outline-none focus:ring-2 focus:ring-blue-500`}/><button onClick={sendMessage} className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Send</button></div></div></>:<div className="flex items-center justify-center h-full"><div className="text-center"><MessageCircle className={`h-16 w-16 mx-auto mb-4 ${darkMode?'text-gray-600':'text-gray-400'}`}/><p className={darkMode?'text-gray-400':'text-gray-600'}>Select a conversation</p></div></div>}</div></div>}
-
-    if(activeTab==='calendar')return<div className="space-y-6 animate-fadeIn"><div className="grid grid-cols-1 md:grid-cols-3 gap-6">{[{label:'This Week',value:sessions.length,icon:Calendar},{label:'Total Hours',value:sessions.length,icon:Clock},{label:'Completed',value:0,icon:CheckCircle}].map((s,i)=><div key={i} className={`p-4 rounded-xl ${darkMode?'bg-gray-800':'bg-white'} shadow-lg`}><div className="flex items-center justify-between"><div><p className={`text-sm ${darkMode?'text-gray-400':'text-gray-600'}`}>{s.label}</p><p className="text-2xl font-bold text-blue-600">{s.value}</p></div><s.icon className="h-8 w-8 text-blue-600"/></div></div>)}</div><div className={`p-6 rounded-xl ${darkMode?'bg-gray-800':'bg-white'} shadow-lg`}><div className="flex items-center justify-between mb-6"><h3 className="text-xl font-semibold">Upcoming Sessions</h3><button onClick={()=>setActiveTab('teachers')} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Book Session</button></div>{sessions.length===0?<div className="text-center py-12"><Calendar className={`h-16 w-16 mx-auto mb-4 ${darkMode?'text-gray-500':'text-gray-400'} opacity-50`}/><p className={darkMode?'text-gray-400':'text-gray-600'}>No sessions scheduled</p></div>:<div className="space-y-4">{sessions.map(s=><div key={s.id} className={`p-4 border rounded-lg ${darkMode?'border-gray-700':'border-gray-200'}`}><div className="flex justify-between"><div><p className="font-medium">{s.subject} with {s.teacher}</p><p className={`text-sm ${darkMode?'text-gray-400':'text-gray-600'}`}>{s.date} at {s.time}</p></div><div className="flex space-x-2"><button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Join</button><button onClick={()=>setSessions(sessions.filter(x=>x.id!==s.id))} className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Cancel</button></div></div></div>)}</div>}</div></div>;
-
-    if(activeTab==='profile')return<div className="space-y-6 animate-fadeIn"><div className={`p-6 rounded-xl ${darkMode?'bg-gray-800':'bg-white'} shadow-lg`}><div className="flex items-center space-x-6"><img src={currentUser.avatar} className="w-32 h-32 rounded-full ring-4 ring-blue-500"/><div className="flex-1"><h2 className="text-3xl font-bold">{currentUser.name}</h2><p className={`text-lg ${darkMode?'text-gray-400':'text-gray-600'}`}>{currentUser.role} • {currentUser.department}</p><p className={darkMode?'text-gray-500':'text-gray-500'}>{currentUser.email}</p><div className="flex items-center space-x-4 mt-3"><div className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-lg"><Award className="h-5 w-5 inline mr-2"/>{currentUser.points} Points</div></div></div><button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Edit Profile</button></div></div><div className="grid grid-cols-2 md:grid-cols-4 gap-4">{[{label:'Books Read',value:'0',icon:BookOpen},{label:'Study Hours',value:sessions.length.toString(),icon:Clock},{label:'Sessions',value:sessions.length.toString(),icon:Users},{label:'Badges',value:(currentUser.badges?.length||0).toString(),icon:Award}].map((s,i)=><div key={i} className={`p-6 rounded-xl ${darkMode?'bg-gray-800':'bg-white'} shadow-lg text-center`}><s.icon className="h-8 w-8 mx-auto text-blue-600 mb-2"/><p className="text-3xl font-bold">{s.value}</p><p className={`text-sm ${darkMode?'text-gray-400':'text-gray-600'}`}>{s.label}</p></div>)}</div></div>;
-
-    if(activeTab==='settings')return<div className="space-y-6 animate-fadeIn"><div className={`p-6 rounded-xl ${darkMode?'bg-gray-800':'bg-white'} shadow-lg`}><h2 className="text-xl font-semibold mb-6">Settings</h2><div className="space-y-6"><div><h3 className="text-lg font-medium mb-4">Appearance</h3><div className={`p-4 rounded-lg ${darkMode?'bg-gray-700':'bg-gray-50'}`}><div className="flex items-center justify-between"><div><p className="font-medium">Dark Mode</p><p className={`text-sm ${darkMode?'text-gray-400':'text-gray-600'}`}>Switch themes</p></div><button onClick={()=>{setDarkMode(!darkMode);addNotification(`Switched to ${!darkMode?'dark':'light'} mode`)}} className={`relative inline-flex h-6 w-11 items-center rounded-full ${darkMode?'bg-blue-600':'bg-gray-300'}`}><span className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${darkMode?'translate-x-6':'translate-x-1'}`}/></button></div></div></div><div><h3 className="text-lg font-medium mb-4">Account</h3><button className={`w-full p-4 rounded-lg text-left ${darkMode?'bg-red-900 hover:bg-red-800':'bg-red-50 hover:bg-red-100'} text-red-600`}><p className="font-medium">Log Out</p></button></div></div></div></div>;
+  // Load data based on user role
+  const loadData = async () => {
+    if (!currentUser) return;
+    
+    setLoading(true);
+    
+    try {
+      if (currentUser.role === 'admin') {
+        console.log('Admin dashboard loaded');
+      } else if (currentUser.role === 'teacher') {
+        const [studentsData, classesData, assignmentsData, analyticsData, resourcesData] = await Promise.all([
+          apiRequest('/teacher/students').catch(() => []),
+          apiRequest('/teacher/classes').catch(() => []),
+          apiRequest('/teacher/assignments').catch(() => []),
+          apiRequest('/teacher/analytics').catch(() => ({})),
+          apiRequest('/resources').catch(() => [])
+        ]);
+        
+        setStudents(studentsData || []);
+        setClasses(classesData || []);
+        setAssignments(assignmentsData || []);
+        setAnalytics(analyticsData || {});
+        setResources(resourcesData || []);
+      } else {
+        const [badgesData, challengesData, rewardsData, teachersData, resourcesData] = await Promise.all([
+          apiRequest('/badges').catch(() => []),
+          apiRequest('/challenges').catch(() => []),
+          apiRequest('/rewards').catch(() => []),
+          apiRequest('/teachers').catch(() => []),
+          apiRequest('/resources').catch(() => [])
+        ]);
+        
+        setBadges(badgesData || []);
+        setChallenges(challengesData || []);
+        setRewards(rewardsData || []);
+        setTeachers(teachersData || []);
+        setResources(resourcesData || []);
+      }
+      
+      const messagesData = await apiRequest('/messages').catch(() => []);
+      setMessages(messagesData || []);
+      
+      const notificationsData = await apiRequest('/notifications').catch(() => []);
+      setNotifications(notificationsData || []);
+    } catch (error) {
+      console.error('Failed to load data:', error);
+      addNotification('Failed to load some data. Please refresh.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return<div className={`min-h-screen transition-colors ${darkMode?'bg-gray-900 text-white':'bg-gray-100 text-gray-900'}`}><nav className={`${darkMode?'bg-gray-800 border-gray-700':'bg-white border-gray-200'} border-b px-4 py-3 sticky top-0 z-50`}><div className="flex items-center justify-between"><div className="flex items-center space-x-4"><div className="flex items-center space-x-2"><div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center"><BookOpen className="h-5 w-5 text-white"/></div><h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">ICCTutor</h1></div></div><div className="flex items-center space-x-2"><div className="relative"><button onClick={()=>setShowNotifications(!showNotifications)} className={`p-2 rounded-lg ${darkMode?'hover:bg-gray-700':'hover:bg-gray-100'} relative`}><Bell className="h-5 w-5"/>{notifications.length>0&&<span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>}</button>{showNotifications&&<div className={`absolute right-0 mt-2 w-80 rounded-lg shadow-2xl ${darkMode?'bg-gray-800 border border-gray-700':'bg-white border'} z-50 animate-fadeIn`}><div className="p-4 border-b"><h3 className="font-semibold">Notifications</h3></div><div className="max-h-96 overflow-y-auto">{notifications.map(n=><div key={n.id} className={`p-4 border-b ${darkMode?'border-gray-700 hover:bg-gray-750':'border-gray-100 hover:bg-gray-50'} cursor-pointer`}><p className="text-sm">{n.message}</p><p className={`text-xs mt-1 ${darkMode?'text-gray-500':'text-gray-500'}`}>{n.time}</p></div>)}</div><div className="p-3 text-center border-t"><button onClick={()=>setNotifications([])} className="text-sm text-blue-600">Clear all</button></div></div>}</div><button onClick={()=>setDarkMode(!darkMode)} className={`p-2 rounded-lg ${darkMode?'hover:bg-gray-700':'hover:bg-gray-100'}`}>{darkMode?<Sun className="h-5 w-5 text-yellow-500"/>:<Moon className="h-5 w-5"/>}</button><div className="flex items-center space-x-3 pl-3 border-l"><img src={currentUser.avatar} className="w-8 h-8 rounded-full ring-2 ring-blue-500"/><div className="hidden md:block"><p className="text-sm font-medium">{currentUser.name}</p><p className={`text-xs ${darkMode?'text-gray-400':'text-gray-600'}`}>{currentUser.role}</p></div></div></div></div></nav><div className="flex"><div className={`${sidebarCollapsed?'w-20':'w-64'} ${darkMode?'bg-gray-800':'bg-white'} min-h-screen border-r ${darkMode?'border-gray-700':'border-gray-200'} transition-all`}><div className="p-4"><button onClick={()=>setSidebarCollapsed(!sidebarCollapsed)} className={`mb-4 p-2 rounded-lg w-full ${darkMode?'hover:bg-gray-700':'hover:bg-gray-100'}`}><div className="flex items-center justify-center"><span className="text-xl">{sidebarCollapsed?'→':'←'}</span></div></button><nav className="space-y-2">{[{id:'dashboard',label:'Dashboard',icon:Home},{id:'resources',label:'Resources',icon:BookOpen},{id:'teachers',label:'Teachers',icon:Users},{id:'notes',label:'Study Notes',icon:FileText},{id:'messages',label:'Messages',icon:MessageCircle},{id:'calendar',label:'Schedule',icon:Calendar},{id:'profile',label:'Profile',icon:User},{id:'settings',label:'Settings',icon:Settings}].map(item=><button key={item.id} onClick={()=>setActiveTab(item.id)} className={`w-full flex items-center ${sidebarCollapsed?'justify-center':'space-x-3'} px-3 py-2.5 rounded-lg text-left transition-all ${activeTab===item.id?(darkMode?'bg-blue-600 text-white shadow-lg':'bg-blue-100 text-blue-900'):(darkMode?'hover:bg-gray-700 text-gray-300':'hover:bg-gray-100 text-gray-700')}`} title={sidebarCollapsed?item.label:undefined}><item.icon className="h-5 w-5 flex-shrink-0"/>{!sidebarCollapsed&&<span>{item.label}</span>}</button>)}</nav></div></div><div className="flex-1 p-6 overflow-x-hidden">{renderContent()}</div></div></div>
+  useEffect(() => {
+    if (isAuthenticated && currentUser) {
+      loadData();
+    }
+  }, [isAuthenticated, currentUser?.id]);
+
+  const addNotification = (message: string) => {
+    const newNotif: NotificationItem = {
+      id: Date.now().toString(),
+      message,
+      time: 'Just now',
+      read: false
+    };
+    setNotifications(prev => [newNotif, ...prev]);
+  };
+
+  const handleLogin = (user: User) => {
+    console.log('🔐 Login handler received user:', user);
+    console.log('🎭 User role:', user.role);
+    
+    setCurrentUser(user);
+    setIsAuthenticated(true);
+    addNotification(`🎉 Welcome back, ${user.name}!`);
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('auth_token');
+    sessionStorage.removeItem('user_data');
+    sessionStorage.removeItem('google_user');
+    setIsAuthenticated(false);
+    setCurrentUser(null);
+    setActiveTab('dashboard');
+    addNotification('👋 Logged out successfully');
+  };
+
+  const renderContent = () => {
+    if (!currentUser) return null;
+    
+    console.log('📄 Rendering content for role:', currentUser?.role, '| activeTab:', activeTab);
+    
+    // ADMIN ROUTES
+    if (currentUser.role === 'admin') {
+      console.log('🛡️ Rendering ADMIN content for tab:', activeTab);
+      
+      if (activeTab === 'profile') {
+        return <Profile 
+          currentUser={currentUser}
+          badges={badges}
+          darkMode={darkMode}
+          setShowSettingsModal={setShowSettingsModal}
+        />;
+      }
+      
+      if (activeTab === 'classes') {
+        return <Classes 
+          currentUser={currentUser} 
+          darkMode={darkMode}
+          apiEndpoint="/api"
+        />;
+      }
+      
+      return <AdminDashboard 
+        currentUser={currentUser} 
+        darkMode={darkMode}
+        activeTab={activeTab}
+      />;
+    }
+    
+    // TEACHER ROUTES
+    if (currentUser.role === 'teacher') {
+      console.log('👨‍🏫 Rendering TEACHER content for tab:', activeTab);
+      
+      switch (activeTab) {
+        case 'dashboard':
+          return <TeacherDashboard 
+            currentUser={currentUser}
+            students={students}
+            classes={classes}
+            assignments={assignments}
+            resources={resources}
+            darkMode={darkMode}
+          />;
+        case 'students':
+          return <TeacherStudents 
+            students={students}
+            darkMode={darkMode}
+            setActiveTab={setActiveTab}
+          />;
+        case 'classes':
+          return <TeacherClasses 
+            classes={classes}
+            setClasses={setClasses}
+            darkMode={darkMode}
+          />;
+        case 'analytics':
+          return <TeacherAnalytics 
+            students={students}
+            classes={classes}
+            assignments={assignments}
+            analytics={analytics}
+            messages={messages}
+            resources={resources}
+            darkMode={darkMode}
+          />;
+        case 'resources':
+          return <Resources 
+            resources={resources}
+            setResources={setResources}
+            darkMode={darkMode}
+          />;
+        case 'messages':
+          return <Messages 
+            messages={messages}
+            teachers={teachers}
+            students={students}
+            currentUser={currentUser}
+            darkMode={darkMode}
+          />;
+        case 'profile':
+          return <Profile 
+            currentUser={currentUser}
+            badges={badges}
+            darkMode={darkMode}
+            setShowSettingsModal={setShowSettingsModal}
+          />;
+        default:
+          return <div className={`p-12 rounded-xl ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg text-center`}>
+            <h3 className="text-2xl font-bold mb-2">Section Not Found</h3>
+            <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
+              The requested section "{activeTab}" is not available.
+            </p>
+          </div>;
+      }
+    }
+
+    // STUDENT ROUTES
+    console.log('🎓 Rendering STUDENT content for tab:', activeTab);
+    
+    switch (activeTab) {
+      case 'dashboard':
+        return <StudentDashboard 
+          currentUser={currentUser}
+          badges={badges}
+          challenges={challenges}
+          resources={resources}
+          darkMode={darkMode}
+        />;
+      case 'badges':
+        return <Badges 
+          badges={badges}
+          setBadges={setBadges}
+          currentUser={currentUser}
+          darkMode={darkMode}
+        />;
+      case 'gamification':
+        return <Gamification 
+          rewards={rewards}
+          currentUser={currentUser}
+          setCurrentUser={setCurrentUser}
+          badges={badges}
+          darkMode={darkMode}
+        />;
+      case 'activities':
+        return <StudentActivities
+          currentUser={currentUser}
+          darkMode={darkMode}
+        />;
+      case 'resources':
+        return <Resources 
+          resources={resources}
+          setResources={setResources}
+          darkMode={darkMode}
+        />;
+      case 'teachers':
+        return <Teachers 
+          teachers={teachers}
+          darkMode={darkMode}
+        />;
+      case 'messages':
+        return <Messages 
+          messages={messages}
+          teachers={teachers}
+          currentUser={currentUser}
+          darkMode={darkMode}
+        />;
+      case 'games':
+        return <Games 
+          currentUser={currentUser}
+          setCurrentUser={setCurrentUser}
+          darkMode={darkMode}
+        />;
+      case 'calendar':
+        return <div className={`p-12 rounded-xl ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg text-center`}>
+          <h3 className="text-2xl font-bold mb-2">📅 Schedule</h3>
+          <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>Calendar feature coming soon!</p>
+        </div>;
+      case 'profile':
+        return <Profile 
+          currentUser={currentUser}
+          badges={badges}
+          darkMode={darkMode}
+          setShowSettingsModal={setShowSettingsModal}
+        />;
+      default:
+        return <div className={`p-12 rounded-xl ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg text-center`}>
+          <h3 className="text-2xl font-bold mb-2">Section Not Found</h3>
+          <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
+            The requested section "{activeTab}" is not available.
+          </p>
+        </div>;
+    }
+  };
+
+  if (!isAuthenticated) {
+    return <AuthForm onLogin={handleLogin} />;
+  }
+
+  return (
+    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
+      <Navbar 
+        currentUser={currentUser}
+        notifications={notifications}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+        addNotification={addNotification}
+        setNotifications={setNotifications}
+      />
+      
+      <div className="flex">
+        <Sidebar 
+          currentUser={currentUser}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          sidebarCollapsed={sidebarCollapsed}
+          setSidebarCollapsed={setSidebarCollapsed}
+          darkMode={darkMode}
+          onLogout={handleLogout}
+        />
+        
+        <main className="flex-1 p-6 transition-all duration-300">
+          {loading ? (
+            <div className="flex items-center justify-center h-96">
+              <div className="text-center animate-pulse">
+                <div className="text-6xl mb-4">⏳</div>
+                <p className={`text-lg font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Loading...</p>
+              </div>
+            </div>
+          ) : (
+            renderContent()
+          )}
+        </main>
+      </div>
+
+      {showSettingsModal && (
+        <SettingsModal 
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+          onClose={() => setShowSettingsModal(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+// Main App Component with Router
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Google OAuth Callback Route */}
+        <Route path="/auth/google/callback" element={<GoogleCallback />} />
+        
+        {/* Main App Route */}
+        <Route path="/*" element={<AppContent />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }

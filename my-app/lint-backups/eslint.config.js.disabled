@@ -1,0 +1,2 @@
+// Disabled copy of eslint.config.js
+export default {};
