@@ -1,0 +1,4 @@
+.captcha-root{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.captcha-image{width:200px;height:60px;background:#eee;display:flex;align-items:center;justify-content:center;border:1px solid #ccc}
+.captcha-status.verified{color:green}
+.captcha-status.invalid{color:red}
