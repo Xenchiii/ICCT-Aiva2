@@ -1,1 +1,3 @@
-/* Navbar styles */
+.navbar { height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); }
+.navbar-search input { padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-primary); width: 300px; }
+.navbar-actions { display: flex; align-items: center; gap: 1.5rem; }

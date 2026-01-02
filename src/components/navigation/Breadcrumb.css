@@ -1,1 +1,65 @@
-/* Breadcrumb styles */
+.breadcrumb-container {
+  padding: 0.75rem 0;
+  margin-bottom: 1rem;
+}
+
+.breadcrumb-list {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: var(--text-muted); /* Uses your global variable */
+}
+
+/* Links (Previous Pages) */
+.breadcrumb-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.breadcrumb-link:hover {
+  color: var(--primary); /* Dark Blue on hover */
+  text-decoration: underline;
+}
+
+.home-icon {
+  display: flex;
+  align-items: center;
+}
+
+/* Separator (>) */
+.breadcrumb-separator {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  margin: 0 8px;
+  opacity: 0.5;
+}
+
+/* Active Page (Current) */
+.breadcrumb-item.active span {
+  color: var(--primary);     /* Dark Blue */
+  font-weight: 600;          /* Semibold */
+  pointer-events: none;
+}
+
+/* Dark Mode Support */
+[data-theme='dark'] .breadcrumb-link:hover {
+  color: var(--secondary);   /* Bumblebee Yellow on Dark Mode */
+}
+
+[data-theme='dark'] .breadcrumb-item.active span {
+  color: var(--text-main);   /* White/Light Grey in Dark Mode */
+}

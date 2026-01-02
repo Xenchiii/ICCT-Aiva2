@@ -1,1 +1,18 @@
-/* utility classes */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-sm { gap: var(--space-sm); }
+.gap-md { gap: var(--space-md); }
+
+.m-0 { margin: 0; }
+.p-4 { padding: var(--space-md); }
+
+.hidden { display: none; }
+.w-full { width: 100%; }
+
+/* Color Helpers */
+.bg-primary { background-color: var(--primary); color: white; }
+.text-primary { color: var(--primary); }
+.text-secondary { color: var(--secondary); }
+.text-success { color: var(--success); }

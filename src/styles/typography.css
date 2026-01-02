@@ -1,1 +1,28 @@
-/* typography */
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  color: var(--primary);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.85rem; }
+h3 { font-size: 1.5rem; }
+
+code, pre {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.9em;
+  background: var(--bg-hover);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
+
+.text-sm { font-size: 0.875rem; }
+.text-lg { font-size: 1.125rem; }
+.font-bold { font-weight: 700; }
+.font-medium { font-weight: 500; }

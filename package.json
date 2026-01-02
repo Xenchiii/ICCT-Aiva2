@@ -1,43 +1,35 @@
 {
-  "name": "icct-aiva",
-  "version": "0.1.0",
+  "name": "icct-aiva-system",
   "private": true,
+  "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "deploy": "wrangler pages deploy dist"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
-    "@monaco-editor/react": "^4.7.0",
-    "@types/react": "^19.2.7",
-    "@types/react-dom": "^19.2.3",
-    "chart.js": "^4.5.1",
-    "date-fns": "^4.1.0",
-    "html2canvas": "^1.4.1",
-    "jspdf": "^3.0.4",
-    "lucide-react": "^0.562.0",
-    "qrcode.react": "^4.2.0",
-    "react": "^19.2.3",
-    "react-big-calendar": "^1.19.4",
-    "react-chartjs-2": "^5.3.1",
-    "react-dom": "^19.2.3",
-    "react-dropzone": "^14.3.8",
-    "react-hook-form": "^7.69.0",
-    "react-hot-toast": "^2.6.0",
-    "react-katex": "^3.1.0",
-    "react-router-dom": "^7.11.0",
-    "recharts": "^3.6.0",
-    "simple-peer": "^9.11.1",
-    "socket.io-client": "^4.8.3",
-    "typescript": "^5.9.3",
-    "zod": "^4.3.4",
-    "zustand": "^5.0.9"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.23.1",
+    "framer-motion": "^11.2.10", 
+    "lucide-react": "^0.395.0",
+    "recharts": "^2.12.7",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.3.0",
+    "date-fns": "^3.6.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^5.1.2",
-    "eslint": "^9.39.2",
-    "prettier": "^3.7.4",
-    "vite": "^7.3.0"
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.1",
+    "wrangler": "^3.60.3"
   }
 }

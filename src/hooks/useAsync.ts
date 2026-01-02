@@ -1,10 +1,31 @@
-import { useState, useEffect } from 'react'
-export default function useAsync<T>(promiseFactory:()=>Promise<T>){
-  const [state,setState] = useState<{loading:boolean;data?:T;error?:any}>({loading:true})
-  useEffect(()=>{
-    let mounted=true
-    promiseFactory().then(data=>mounted && setState({loading:false,data})).catch(error=>mounted && setState({loading:false,error}))
-    return ()=>{mounted=false}
-  },[promiseFactory])
-  return state
-}
+import { useState, useCallback, useEffect} from 'react';
+
+export const useAsync = <T>(asyncFunction: () => Promise<T>, immediate = false) => {
+  const [status, setStatus] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
+  const [value, setValue] = useState<T | null>(null);
+  const [error, setError] = useState<any>(null);
+
+  const execute = useCallback(async () => {
+    setStatus('pending');
+    setValue(null);
+    setError(null);
+
+    try {
+      const response = await asyncFunction();
+      setValue(response);
+      setStatus('success');
+    } catch (e) {
+      setError(e);
+      setStatus('error');
+    }
+  }, [asyncFunction]);
+
+  // Execute immediately if requested
+  useEffect(() => {
+    if (immediate) {
+      execute();
+    }
+  }, [execute, immediate]);
+
+  return { execute, status, value, error };
+};

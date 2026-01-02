@@ -1,1 +1,23 @@
-/* themes */
+[data-theme='light'] {
+  --bg-app: var(--bg-light);
+  --bg-card: #FFFFFF;
+  --text-main: var(--text-light);
+  --text-muted: #6B7280;
+  --border-color: var(--border-light);
+  --hover-color: #F3F4F6;
+}
+
+[data-theme='dark'] {
+  --bg-app: var(--bg-dark);
+  --bg-card: #242424;
+  --text-main: var(--text-dark);
+  --text-muted: #9CA3AF;
+  --border-color: var(--border-dark);
+  --hover-color: #2D2D2D;
+}
+
+body {
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  transition: background 0.3s ease, color 0.3s ease;
+}

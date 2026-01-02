@@ -1,5 +1,0 @@
-// Disabled copy of eslint.config.js to avoid loading the project's flat config
-// during automated lint runs. The original full config is saved as
-// eslint.config.js.bak in the repository root.
-
-export default {};

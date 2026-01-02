@@ -1,1 +1,2 @@
-/* ThemeSwitcher styles */
+.theme-toggle { background: none; border: none; cursor: pointer; color: var(--text-primary); padding: 8px; border-radius: 50%; transition: background 0.2s; }
+.theme-toggle:hover { background: var(--hover-color); }

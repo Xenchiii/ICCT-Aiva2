@@ -1,7 +1,12 @@
 from flask import Blueprint, jsonify
+from ai_services.predictions import GradePredictor
 
-bp = Blueprint('analytics', __name__)
+analytics_bp = Blueprint('analytics_routes', __name__)
+predictor = GradePredictor()
 
-@bp.route('/health')
-def health():
-    return jsonify({"status":"ok"})
+@analytics_bp.route('/predict-grade', methods=['GET'])
+def get_prediction():
+    # Hardcoded input for simulation
+    mock_data = {"quiz": 85, "midterm": 88}
+    result = predictor.forecast(mock_data)
+    return jsonify(result)

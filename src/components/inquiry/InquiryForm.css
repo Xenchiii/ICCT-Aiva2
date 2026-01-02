@@ -1,1 +1,61 @@
-/* InquiryForm styles */
+.inquiry-form-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.inquiry-form-container form {
+  border-radius: 20px;
+  padding: 32px;
+  background: white;
+  box-shadow: 0 4px 20px rgba(0, 48, 73, 0.05); /* Soft Dark Blue shadow */
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 700;
+  color: #003049; /* Dark Blue */
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.form-group input, 
+.form-group select, 
+.form-group textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #f1f5f9;
+  border-radius: 12px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background-color: #f8fafc;
+}
+
+.form-group input:focus, 
+.form-group select:focus, 
+.form-group textarea:focus {
+  outline: none;
+  border-color: #FCE205; /* Bumblebee */
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(252, 226, 5, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.inquiry-submit-btn {
+  background-color: #003049;
+  color: #FCE205; /* Bumblebee text on Dark Blue button */
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: transform 0.2s active;
+}
+
+.inquiry-submit-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}

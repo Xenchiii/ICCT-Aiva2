@@ -1,1 +1,24 @@
-/* responsive styles */
+/* Tablet */
+@media (max-width: 1024px) {
+  :root { --space-unit: 0.875rem; }
+  h1 { font-size: 1.8rem; }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px; /* Mini sidebar on mobile */
+  }
+  .navbar-search {
+    display: none;
+  }
+  .container {
+    padding: 0 var(--space-sm);
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  h1 { font-size: 1.5rem; }
+  .flex-mobile-stack { flex-direction: column; }
+}

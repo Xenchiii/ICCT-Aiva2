@@ -1,1 +1,121 @@
-/* AivaChat styles */
+.aiva-chat-window {
+  position: fixed;
+  bottom: 100px;
+  right: 32px;
+  width: 380px;
+  height: 500px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1000;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.chat-header {
+  background: #003049; /* Dark Blue */
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-body {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.message-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.user-row {
+  justify-content: flex-end;
+}
+
+.message-bubble {
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  max-width: 80%;
+  line-height: 1.4;
+}
+
+.message-bubble.ai {
+  background: white;
+  border: 1px solid #eee;
+  border-bottom-left-radius: 4px;
+  color: #333;
+}
+
+.message-bubble.user {
+  background: #003049;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatar.ai { background: #FCE205; color: #003049; }
+.avatar.user { background: #ddd; color: #666; }
+
+.chat-footer {
+  padding: 12px;
+  background: white;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 8px;
+}
+
+.chat-footer input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  outline: none;
+  font-size: 14px;
+}
+
+.chat-footer button {
+  background: #003049;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.typing-indicator span {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #ccc;
+  border-radius: 50%;
+  margin: 0 2px;
+  animation: typing 1s infinite;
+}
+
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
