@@ -1,4 +1,3 @@
-import React from 'react';
 import { Check, X, FileText } from 'lucide-react';
 
 const ApplicationReview = () => {

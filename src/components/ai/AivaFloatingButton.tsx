@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react'; // FIX: Removed 'React' from here
 import { Sparkles, X } from 'lucide-react';
 import AivaChat from './AivaChat';
 

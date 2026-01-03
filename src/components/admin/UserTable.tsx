@@ -1,4 +1,3 @@
-import React from 'react';
 import { MoreVertical, Shield } from 'lucide-react';
 
 const UserTable = () => {

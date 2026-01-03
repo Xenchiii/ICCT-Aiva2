@@ -1,4 +1,3 @@
-import React from 'react';
 import { Eye, AlertOctagon, Monitor } from 'lucide-react';
 
 const BehaviorDetection = () => {

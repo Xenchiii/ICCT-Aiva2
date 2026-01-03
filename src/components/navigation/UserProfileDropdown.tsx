@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './UserProfileDropdown.css';
 import { User, LogOut, ChevronDown } from 'lucide-react';
 

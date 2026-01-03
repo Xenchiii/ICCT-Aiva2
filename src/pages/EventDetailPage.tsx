@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Calendar, MapPin, Users, CheckCircle, QrCode } from 'lucide-react';
 import { formatDateTime } from '@/utils/dateFormatter';

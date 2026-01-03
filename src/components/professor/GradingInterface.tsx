@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Save, Download } from 'lucide-react';
 
 const GradingInterface = () => {

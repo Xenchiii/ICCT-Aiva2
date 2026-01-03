@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react'; // FIX: Removed 'React' from here
 import { ToggleLeft, ToggleRight, Save } from 'lucide-react';
 
 const SystemSettings = () => {

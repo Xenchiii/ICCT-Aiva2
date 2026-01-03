@@ -1,8 +1,6 @@
-import React from 'react'
-export default function InquiryForm(){return <div>Inquiry Form</div>}
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send, AlertCircle } from 'lucide-react';
+import { Send } from 'lucide-react';
 import './InquiryForm.css';
 
 const InquiryForm = () => {
@@ -21,17 +19,28 @@ const InquiryForm = () => {
     navigate('/dashboard/my-inquiries');
   };
 
+  // Helper to handle all input changes cleanly and fix TypeScript errors
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   return (
     <div className="inquiry-form-container">
       <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-xl shadow-sm border">
+        
         <div className="form-group">
           <label className="text-sm font-bold text-primary">Subject/Issue Title</label>
           <input 
             type="text" 
+            name="subject"
             required 
             placeholder="e.g., Grade dispute for IT 302"
             className="w-full p-2 border rounded-lg mt-1"
-            onChange={(e) => setFormData({...formData, subject: e.target.value})}
+            onChange={handleChange}
           />
         </div>
 
@@ -39,8 +48,10 @@ const InquiryForm = () => {
           <div className="form-group">
             <label className="text-sm font-bold text-primary">Category</label>
             <select 
+              name="category"
               className="w-full p-2 border rounded-lg mt-1"
-              onChange={(e) => setFormData({...formData, category: e.target.value})}
+              onChange={handleChange}
+              defaultValue="Academic"
             >
               <option>Academic</option>
               <option>Technical</option>
@@ -51,8 +62,10 @@ const InquiryForm = () => {
           <div className="form-group">
             <label className="text-sm font-bold text-primary">Priority Level</label>
             <select 
+              name="priority"
               className="w-full p-2 border rounded-lg mt-1"
-              onChange={(e) => setFormData({...formData, priority: e.target.value})}
+              onChange={handleChange}
+              defaultValue="Normal"
             >
               <option>Low</option>
               <option>Normal</option>
@@ -65,11 +78,12 @@ const InquiryForm = () => {
         <div className="form-group">
           <label className="text-sm font-bold text-primary">Detailed Description</label>
           <textarea 
+            name="description"
             rows={5} 
             required
             placeholder="Please provide as much detail as possible..."
             className="w-full p-2 border rounded-lg mt-1"
-            onChange={(e) => setFormData({...formData, description: e.target.value})}
+            onChange={handleChange}
           ></textarea>
         </div>
 

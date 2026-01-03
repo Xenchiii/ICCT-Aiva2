@@ -1,51 +1,45 @@
 #include <iostream>
 #include <vector>
-#include <thread>
-#include <chrono>
-#include "../include/calculations.h"
+#include <thread> // For sleep
+#include <chrono> // For time
+
 #include "../include/hardware_api.h"
+#include "../include/calculations.h"
 #include "../include/performance_computing.h"
 
-using namespace Aiva;
-
 int main() {
-    std::cout << "=== ICCT AIVA C++ BACKEND MODULE ===" << std::endl;
+    std::cout << "--- ICCT Aiva Hardware Module (SIMULATION) ---" << std::endl;
 
-    // 1. TEST CALCULATIONS
-    std::cout << "\n[TEST] Grading Logic:" << std::endl;
-    double rawScore = 88.5;
-    std::string grade = getTransmutedGrade(rawScore);
-    std::cout << "Score: " << rawScore << " -> Transmuted: " << grade << " (" << getRemarks(std::stod(grade)) << ")" << std::endl;
+    // 1. Setup Mock Components
+    HardwareAPI hw;
+    Calculations calc;
+    PerformanceComputing perf;
 
-    // 2. TEST HARDWARE API
-    std::cout << "\n[TEST] Hardware Interface:" << std::endl;
-    if (HardwareInterface::connect("COM3")) {
-        HardwareInterface::sendCommand("SERVO_UNLOCK");
-        
-        // Simulate waiting for a card scan
-        std::cout << "Waiting for RFID scan..." << std::endl;
-        SensorData scan = HardwareInterface::readSensor();
-        std::cout << "Read Data: " << scan.rawPayload << " from " << scan.deviceId << std::endl;
-        
-        HardwareInterface::disconnect();
+    hw.connect("COM3");
+
+    // 2. Hardcoded Test Data
+    std::vector<int> mockGrades = {85, 90, 88, 92, 95};
+
+    // 3. Main Loop (Simulates the device running)
+    for (int i = 0; i < 3; i++) {
+        std::cout << "\n--- Cycle " << i + 1 << " ---" << std::endl;
+
+        // Fake Read
+        std::string rfid = hw.readData();
+        std::cout << "Read RFID: " << rfid << std::endl;
+
+        // Fake Calculation
+        double gwa = calc.convertToGWA(95); // Hardcoded input 95
+        std::cout << "Converted 95 to GWA: " << gwa << std::endl;
+
+        // Fake Stats
+        ClassStats stats = perf.calculateClassStats(mockGrades);
+        std::cout << "Class Pass Rate: " << stats.passRate << "%" << std::endl;
+
+        // Sleep for 1 second to look cool
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
-    // 3. TEST PERFORMANCE ENGINE
-    std::cout << "\n[TEST] Analytics Engine:" << std::endl;
-    // Create fake data for 1000 students
-    std::vector<std::vector<SubjectGrade>> batchData;
-    for(int i=0; i<1000; i++) {
-        std::vector<SubjectGrade> student = {
-            {"IT302", 3.0, (rand() % 500) / 100.0}, // Random grade 0.0 - 5.0
-            {"CS101", 3.0, 1.25}
-        };
-        batchData.push_back(student);
-    }
-
-    OptimizationResult res = PerformanceEngine::processBatchGrades(batchData);
-    std::cout << "Processed " << res.itemsProcessed << " records in " << res.executionTimeMs << "ms." << std::endl;
-    std::cout << "Class Average: " << res.averageScore << std::endl;
-    std::cout << "Students Flagged At-Risk: " << res.flaggedIds.size() << std::endl;
-
+    hw.disconnect();
     return 0;
 }

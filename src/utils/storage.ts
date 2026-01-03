@@ -39,7 +39,8 @@ export const storage = {
   },
 };
 
-export const sessionStorage = {
+// Renamed to 'appSessionStorage' to avoid conflict with the global window.sessionStorage
+export const appSessionStorage = {
   set: (key: string, value: any): void => {
     try {
       const serialized = JSON.stringify(value);

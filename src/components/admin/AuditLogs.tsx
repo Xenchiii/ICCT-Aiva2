@@ -1,4 +1,3 @@
-import React from 'react';
 import { Clock, ShieldAlert, User } from 'lucide-react';
 
 const AuditLogs = () => {

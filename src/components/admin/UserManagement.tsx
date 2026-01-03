@@ -1,4 +1,3 @@
-import React from 'react';
 import UserTable from './UserTable';
 import { Search, Plus } from 'lucide-react';
 

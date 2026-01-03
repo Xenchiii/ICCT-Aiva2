@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, X, Bot, User, Sparkles } from 'lucide-react';
+import { Send, X, Bot, User } from 'lucide-react';
 import './AivaChat.css';
 
 interface Message {
@@ -23,7 +23,7 @@ const AivaChat = ({ onClose }: { onClose: () => void }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView?.({ behavior: "smooth" });
   };
 
   useEffect(scrollToBottom, [messages]);

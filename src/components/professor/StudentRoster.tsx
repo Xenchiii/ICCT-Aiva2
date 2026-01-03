@@ -1,4 +1,3 @@
-import React from 'react';
 import { Mail, MoreHorizontal } from 'lucide-react';
 
 const students = [

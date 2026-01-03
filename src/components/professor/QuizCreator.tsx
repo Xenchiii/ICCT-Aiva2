@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 
 const QuizCreator = () => {
@@ -27,7 +27,7 @@ const QuizCreator = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {q.options.map((opt, oIndex) => (
+            {q.options.map((_, oIndex) => (
               <div key={oIndex} className="flex items-center gap-2">
                 <input type="radio" name={`correct-${q.id}`} className="w-4 h-4 text-primary" />
                 <input type="text" className="flex-1 p-2 border border-gray-300 rounded text-sm" placeholder={`Option ${oIndex + 1}`} />

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { User, Mail, GraduationCap, Calendar } from 'lucide-react';
 

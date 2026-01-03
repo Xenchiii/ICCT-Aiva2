@@ -2,3 +2,7 @@ flask
 flask-cors
 requests
 numpy
+opencv-python
+scikit-learn
+textblob
+nltk

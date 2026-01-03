@@ -1,4 +1,3 @@
-import React from 'react';
 import { ShieldCheck, MessageSquare, Server, AlertCircle } from 'lucide-react';
 
 const AdminDashboard = () => {

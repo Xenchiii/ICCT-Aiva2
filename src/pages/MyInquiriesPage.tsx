@@ -1,4 +1,3 @@
-import React from 'react';
 import { useInquiryContext } from '@/contexts/InquiryContext';
 import { formatRelativeTime } from '@/utils/dateFormatter';
 

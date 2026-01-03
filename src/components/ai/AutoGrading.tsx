@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FileText, CheckCircle, AlertTriangle, Loader2, Sparkles } from 'lucide-react';
 
 const AutoGrading = () => {

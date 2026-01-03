@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MessageSquare, LifeBuoy, ShieldAlert, GraduationCap } from 'lucide-react';
 

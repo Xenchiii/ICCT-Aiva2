@@ -1,5 +1,4 @@
-import React from 'react';
-import { Clock, MousePointer, BookOpen, Activity } from 'lucide-react';
+import { Clock, MousePointer, Activity } from 'lucide-react'; // FIX: Removed 'React' and unused 'BookOpen'
 
 const EngagementTracking = () => {
   // Hardcoded engagement metrics

@@ -1,4 +1,3 @@
-import React from 'react';
 import { BookOpen, Video, ArrowRight, BrainCircuit } from 'lucide-react';
 
 const ContentRecommendation = () => {
