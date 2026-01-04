@@ -1,7 +1,6 @@
-import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useGrades } from '@/hooks/useGrades';
-import { BookOpen, Trophy, HelpCircle } from 'lucide-react';
+import { BookOpen, HelpCircle, Trophy } from 'lucide-react';
 
 const HomePage = () => {
   const { user } = useAuth();

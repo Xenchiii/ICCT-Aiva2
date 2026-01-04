@@ -1,7 +1,5 @@
-'use client'; // Required for Context in App Router
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation'; // Use Next.js router
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Changed from next/navigation
 import { AuthService } from '../services/auth.service';
 
 interface User {
@@ -25,10 +23,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
+  
+  // Use React Router hook
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Restore session purely on client-side
     const initAuth = async () => {
       const token = localStorage.getItem('token');
       if (token) {
@@ -50,7 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { user, token } = await AuthService.login(credentials);
       localStorage.setItem('token', token);
       setUser(user);
-      router.push('/dashboard'); // Smooth client-side transition
+      navigate('/dashboard'); // Changed from router.push
     } catch (error) {
       throw error;
     } finally {
@@ -61,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
-    router.push('/login');
+    navigate('/login'); // Changed from router.push
   };
 
   return (

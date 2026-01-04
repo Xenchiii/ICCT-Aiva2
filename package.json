@@ -1,43 +1,30 @@
 {
-  "name": "icct-aiva-system",
+  "name": "icct-aiva2",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "deploy": "wrangler pages deploy dist",
-
-    "//": "--- PYTHON AI COMMANDS ---",
-    "install:ai": "pip install opencv-python numpy scikit-learn nltk textblob flask flask-cors",
-    "start:ai": "cd ai_services && python run.py",
-    
-    "//": "--- RUN EVERYTHING TOGETHER ---",
-    "dev:all": "concurrently \"npm run dev\" \"npm run start:ai\""
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.23.1",
-    "framer-motion": "^11.2.10", 
-    "lucide-react": "^0.395.0",
-    "recharts": "^2.12.7",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^2.3.0",
-    "date-fns": "^3.6.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.30.2"
   },
   "devDependencies": {
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
-    "autoprefixer": "^10.4.19",
-    "postcss": "^8.4.38",
-    "tailwindcss": "^3.4.4",
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
     "typescript": "^5.2.2",
-    "vite": "^5.3.1",
-    "wrangler": "^3.60.3",
-    "concurrently": "^8.2.2"
+    "vite": "^5.0.8"
   }
 }

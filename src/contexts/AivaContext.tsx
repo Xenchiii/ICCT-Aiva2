@@ -1,7 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
 import { usePathname } from 'next/navigation'; // Detect current page
+import React, { createContext, useState } from 'react';
 import { AiService } from '../services/ai.service';
 
 interface Message {

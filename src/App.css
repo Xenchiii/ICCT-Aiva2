@@ -1,2 +1,55 @@
-/* Global app styles placeholder */
-.app-root{font-family:system-ui, sans-serif}
+.app-root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.app-layout {
+  display: flex;
+  min-height: calc(100vh - 60px); /* Adjust based on navbar height */
+}
+
+.app-layout aside {
+  width: 260px;
+  position: sticky;
+  top: 60px;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+  background-color: #f8f9fa;
+  border-right: 1px solid #e0e0e0;
+}
+
+.app-layout main {
+  flex: 1;
+  padding: 20px;
+  background-color: #ffffff;
+  overflow-y: auto;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .app-layout aside {
+    background-color: #1a1a1a;
+    border-right-color: #333;
+  }
+  
+  .app-layout main {
+    background-color: #242424;
+  }
+}
+
+/* Responsive layout */
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+  }
+  
+  .app-layout aside {
+    width: 100%;
+    position: static;
+    height: auto;
+  }
+  
+  .app-layout main {
+    padding: 15px;
+  }
+}
