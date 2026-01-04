@@ -1,4 +1,4 @@
-package com.icctaiva.model;
+package com.icct.aiva.model;
 
 public class Course {
     private String courseCode; // e.g., "IT 302"

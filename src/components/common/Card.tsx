@@ -1,2 +1,8 @@
-import React from 'react'
-export default function Card(){return <div className="card"/>}
+import React from 'react';
+import './Card.css';
+
+const Card: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => {
+  return <div className={`card ${className}`}>{children}</div>;
+};
+
+export default Card;

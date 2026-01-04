@@ -1,1 +1,6 @@
-/* Gradebook styles */
+.grade-row:last-child {
+  border-bottom: none;
+}
+.grade-total {
+  border-top: 2px solid #e5e7eb;
+}

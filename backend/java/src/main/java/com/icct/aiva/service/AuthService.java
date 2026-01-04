@@ -1,4 +1,4 @@
-package com.icctaiva.service;
+package com.icct.aiva.service;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

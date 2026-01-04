@@ -1,56 +1,85 @@
-package com.icct.aiva.controller;
+package com.icct.aiva.controller; // 1. FIX: Added Package Declaration
 
-import com.icct.aiva.service.AuthService;
-import com.icct.aiva.security.JwtTokenProvider;
 import com.icct.aiva.model.User;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.Gson; // Assuming you use Gson for JSON
+import com.icct.aiva.payload.AuthResponse;
+import com.icct.aiva.payload.LoginRequest;
+import com.icct.aiva.payload.RegisterRequest;
+import com.icct.aiva.repository.UserRepository;
+import com.icct.aiva.security.JwtTokenProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
+@RestController
+@RequestMapping("/api/auth")
 public class AuthController {
 
-    private AuthService authService;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private JwtTokenProvider tokenProvider;
-    private Gson gson;
 
-    public AuthController() {
-        this.authService = new AuthService();
-        this.tokenProvider = new JwtTokenProvider();
-        this.gson = new Gson();
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        // 2. FIX: Actually perform the authentication
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                request.getEmail(),
+                request.getPassword()
+            )
+        );
+
+        // Set the authentication in the context
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // 3. FIX: Generate the token (defines the 'token' variable you were missing)
+        String token = tokenProvider.generateToken(authentication);
+        
+        // Get user details to return to frontend
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
+
+        // 4. FIX: Return the response with the defined variables
+        return ResponseEntity.ok(new AuthResponse(token, user));
     }
 
-    // POST /api/auth/login
-    public String login(String requestBody) {
-        try {
-            User loginRequest = gson.fromJson(requestBody, User.class);
-
-            if (loginRequest == null || loginRequest.getEmail() == null || loginRequest.getPassword() == null) {
-                return gson.toJson(new AuthResponse(false, null, "Missing email or password"));
-            }
-
-            boolean authenticated = authService.login(loginRequest.getEmail(), loginRequest.getPassword());
-            if (authenticated) {
-                String token = tokenProvider.createToken(loginRequest.getEmail(), "Student");
-                return gson.toJson(new AuthResponse(true, token, "Login Successful"));
-            } else {
-                return gson.toJson(new AuthResponse(false, null, "Invalid Credentials"));
-            }
-        } catch (JsonSyntaxException e) {
-            return gson.toJson(new AuthResponse(false, null, "Invalid request payload"));
-        } catch (Exception e) {
-            return gson.toJson(new AuthResponse(false, null, "Server error"));
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        // Check if email already exists
+        if(userRepository.existsByEmail(request.getEmail())) {
+            return new ResponseEntity<>("Email is already taken!", HttpStatus.BAD_REQUEST);
         }
+
+        // Create new user
+        User user = new User();
+        user.setName(request.getFullName());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole("student"); // Default role
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok("User registered successfully");
     }
-
-    // Helper Response Class
-    static class AuthResponse {
-        boolean success;
-        String token;
-        String message;
-
-        public AuthResponse(boolean success, String token, String message) {
-            this.success = success;
-            this.token = token;
-            this.message = message;
-        }
+    
+    @GetMapping("/me")
+    // 5. FIX: Added imports for AuthenticationPrincipal and UserDetails
+    public ResponseEntity<?> getCurrentUser(@org.springframework.security.core.annotation.AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow();
+        return ResponseEntity.ok(user);
     }
 }

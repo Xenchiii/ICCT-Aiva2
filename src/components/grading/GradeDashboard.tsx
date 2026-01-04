@@ -1,6 +1,5 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Users, BarChart3, ArrowRight, AlertCircle } from 'lucide-react';
+import { BookOpen, Users, BarChart3, ArrowRight } from 'lucide-react';
 import './GradeDashboard.css';
 
 const GradeDashboard = () => {

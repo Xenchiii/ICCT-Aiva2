@@ -1,10 +1,9 @@
-import { useParams } from 'react-router-dom';
-import { Calendar, MapPin, Users, CheckCircle, QrCode } from 'lucide-react';
+import { useState } from 'react';
+import { Calendar, MapPin, CheckCircle, QrCode } from 'lucide-react';
 import { formatDateTime } from '@/utils/dateFormatter';
 
 const EventDetailPage = () => {
-  const { id } = useParams();
-  const [isRegistered, setIsRegistered] = useState(false);
+   const [isRegistered, setIsRegistered] = useState(false);
 
   // Mock data representing an ICCT campus event
   const event = {

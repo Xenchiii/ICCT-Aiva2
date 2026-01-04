@@ -1,4 +1,3 @@
-import React from 'react';
 import './Navbar.css';
 import ThemeSwitcher from './ThemeSwitcher';
 import NotificationCenter from './NotificationCenter';

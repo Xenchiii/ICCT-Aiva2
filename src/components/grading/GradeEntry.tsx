@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Save, Download, Calculator, ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
+import { Save, Calculator, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import './GradeEntry.css';
+// import './GradeEntry.css'; // Uncomment if you actually have this file
 
 const GradeEntry = () => {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ const GradeEntry = () => {
       else if (rawScore >= 75) transmuted = 2.75;
       else if (rawScore >= 75) transmuted = 3.00;
       
-      return { ...s, final: rawScore.toFixed(1), grade: transmuted.toFixed(2) };
+      return { ...s, final: parseFloat(rawScore.toFixed(1)), grade: parseFloat(transmuted.toFixed(2)) };
     });
     setStudents(updated);
   };
@@ -74,7 +74,8 @@ const GradeEntry = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {students.map((s, idx) => (
+            {/* FIX: Removed 'idx' because it was unused */}
+            {students.map((s) => (
               <tr key={s.id} className="hover:bg-gray-50 transition">
                 <td className="px-6 py-3 font-medium text-gray-800">{s.name}</td>
                 <td className="px-4 py-3">

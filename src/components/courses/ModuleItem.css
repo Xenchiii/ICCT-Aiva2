@@ -1,1 +1,9 @@
-/* ModuleItem styles */
+.module-item:hover {
+  background-color: #f9fafb;
+}
+.module-icon {
+  transition: transform 0.2s ease;
+}
+.module-item:hover .module-icon {
+  transform: scale(1.1);
+}

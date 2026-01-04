@@ -1,4 +1,3 @@
-import React from 'react';
 import { Printer, Download } from 'lucide-react';
 import './StudentGradePortal.css'; // Assuming you create this CSS file or use Tailwind
 

@@ -1,4 +1,4 @@
-package com.icctaiva.repository;
+package com.icct.aiva.repository;
 
 import java.util.ArrayList;
 import java.util.List;

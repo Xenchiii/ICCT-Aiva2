@@ -1,1 +1,24 @@
-/* Button styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  font-size: 0.875rem;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-primary { background-color: #003049; color: white; }
+.btn-primary:hover { background-color: #002233; }
+
+.btn-secondary { background-color: #f3f4f6; color: #374151; }
+.btn-secondary:hover { background-color: #e5e7eb; }
+
+.btn-outline { border: 1px solid #d1d5db; background: transparent; color: #374151; }
+.btn-outline:hover { border-color: #003049; color: #003049; }
+
+.btn-full { width: 100%; }

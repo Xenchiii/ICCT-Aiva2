@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import StudentDashboard from './StudentDashboard';
 import ProfessorDashboard from './ProfessorDashboard';
@@ -6,7 +5,7 @@ import AdminDashboard from './AdminDashboard';
 import { Loader2 } from 'lucide-react';
 
 const DashboardRouter = () => {
-  const { user, isLoading } = useAuth(); //
+  const { user, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -21,12 +20,14 @@ const DashboardRouter = () => {
    * Role-Based Access Control (RBAC)
    * Directs user to their specialized cockpit based on account type.
    */
+  // FIX: Changed cases to lowercase to match the 'User' interface definition
+  // 'Professor' was also mapped to 'faculty'
   switch (user?.role) {
-    case 'Admin':
+    case 'admin':
       return <AdminDashboard />;
-    case 'Professor':
+    case 'faculty': 
       return <ProfessorDashboard />;
-    case 'Student':
+    case 'student':
     default:
       return <StudentDashboard />;
   }

@@ -1,22 +1,29 @@
 #include "../include/performance_computing.h"
-#include <iostream>
+#include <numeric>   // Needed for calculating sums
+#include <algorithm> // Needed for finding min/max
 
-// HARDCODED: Returns static stats regardless of input
 ClassStats PerformanceComputing::calculateClassStats(const std::vector<int>& grades) {
-    ClassStats stats;
+    ClassStats stats = {0.0, 0.0, 0, 0};
     
-    // Fake data to simulate a high-performing class
-    stats.average = 88.5;
-    stats.highest = 98;
-    stats.lowest = 75;
-    stats.stdDev = 4.2;
-    stats.passRate = 95.5; // 95.5% passing
+    if (grades.empty()) return stats;
 
-    std::cout << "[CPP] Computed Hardcoded Stats: Avg=88.5, High=98" << std::endl;
+    // 1. Calculate Average
+    double sum = std::accumulate(grades.begin(), grades.end(), 0.0);
+    stats.average = sum / grades.size();
+
+    // 2. Find Highest and Lowest
+    auto minmax = std::minmax_element(grades.begin(), grades.end());
+    stats.lowest = *minmax.first;
+    stats.highest = *minmax.second;
+
+    // 3. Calculate Pass Rate (Assuming 75 is the passing grade)
+    int passingCount = 0;
+    for(int g : grades) {
+        if(g >= 75) passingCount++;
+    }
+    
+    // Convert to percentage
+    stats.passRate = (static_cast<double>(passingCount) / grades.size()) * 100.0;
+
     return stats;
-}
-
-// HARDCODED: Always predicts the student will improve
-double PerformanceComputing::predictNextGrade(const std::vector<int>& history) {
-    return 92.0; // Assume next grade is 92
 }

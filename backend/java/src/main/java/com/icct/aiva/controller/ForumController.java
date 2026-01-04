@@ -1,36 +1,36 @@
-// FIX: Correct Package Name
 package com.icct.aiva.controller;
 
-// FIX: Correct Imports
+import com.icct.aiva.model.User;
 import com.icct.aiva.repository.UserRepository;
-// Note: Ensure your UserRepository returns this User model, or update this import to match
-import com.icct.aiva.model.User; 
-import com.google.gson.Gson;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Optional;
 
-// FIX: Removed "<UserRepository>" which was causing the instantiation error
-public class UserController {
+@RestController
+@RequestMapping("/api/forum")
+public class ForumController {
 
+    @Autowired
     private UserRepository userRepo;
-    private Gson gson;
 
-    public UserController() {
-        // Now this will work because UserRepository refers to the actual class, not a generic type
-        this.userRepo = new UserRepository();
-        this.gson = new Gson();
-    }
+    // NOTE: In Spring Boot, we don't say "new UserRepository()". 
+    // We let Spring give us the connection automatically using @Autowired.
 
-    // GET /api/user/profile
-    public String getProfile(String email) {
-        // Note: Depending on your UserRepository implementation, 
-        // you might need to change 'User' here to 'UserRepository.User' if you used the inner class version.
-        // Assuming you are using the separate Model class:
+    // GET /api/forum/user-profile
+    @GetMapping("/user-profile")
+    public ResponseEntity<?> getProfile(@RequestParam String email) {
         Optional<User> user = userRepo.findByEmail(email);
-        
+
         if (user.isPresent()) {
-            return gson.toJson(user.get());
+            // Spring automatically converts the User object to JSON
+            return ResponseEntity.ok(user.get());
         } else {
-            return "{\"error\": \"User not found\"}";
+            return ResponseEntity.badRequest().body("{\"error\": \"User not found\"}");
         }
     }
+    
+    // You can add real Forum endpoints here later, like:
+    // @PostMapping("/create-post") ...
 }

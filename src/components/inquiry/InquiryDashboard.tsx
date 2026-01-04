@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import InquiryList from './InquiryList';
 import InquiryFilters from './InquiryFilters';
 import InquiryAnalytics from './InquiryAnalytics';
-import { LayoutDashboard, ListFilter, BarChart3 } from 'lucide-react';
+import { ListFilter, BarChart3 } from 'lucide-react';
 
 const InquiryDashboard = () => {
   const [view, setView] = useState<'list' | 'analytics'>('list');

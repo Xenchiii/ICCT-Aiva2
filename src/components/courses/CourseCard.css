@@ -1,1 +1,2 @@
-/* CourseCard styles */
+.course-card { transition: transform 0.2s; }
+.course-card:hover { transform: translateY(-4px); }

@@ -1,5 +1,3 @@
-import { ApiService } from './api.service';
-
 export interface Inquiry {
   id: string;
   subject: string;
@@ -29,10 +27,48 @@ export const InquiryService = {
     const newTicket = { 
       ...data, 
       id: `INQ-${Math.floor(Math.random() * 1000)}`, 
-      status: 'Open',
+      status: 'Open' as const,
       createdAt: new Date().toISOString()
     } as Inquiry;
     MOCK_TICKETS.push(newTicket); // Add to local mock DB
     return newTicket;
+  },
+
+  // 3. Update Ticket (NEW - needed for updateInquiryStatus)
+  update: async (id: string, data: Partial<Inquiry>): Promise<Inquiry> => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    const ticketIndex = MOCK_TICKETS.findIndex(ticket => ticket.id === id);
+    if (ticketIndex === -1) {
+      throw new Error(`Ticket with id ${id} not found`);
+    }
+
+    // Update the ticket in the mock database
+    MOCK_TICKETS[ticketIndex] = {
+      ...MOCK_TICKETS[ticketIndex],
+      ...data
+    };
+
+    return MOCK_TICKETS[ticketIndex];
+  },
+
+  // 4. Get Single Ticket by ID (Bonus - useful for detail views)
+  getById: async (id: string): Promise<Inquiry | null> => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const ticket = MOCK_TICKETS.find(ticket => ticket.id === id);
+    return ticket || null;
+  },
+
+  // 5. Delete Ticket (Bonus - for admin functionality)
+  delete: async (id: string): Promise<boolean> => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const ticketIndex = MOCK_TICKETS.findIndex(ticket => ticket.id === id);
+    
+    if (ticketIndex === -1) {
+      return false;
+    }
+
+    MOCK_TICKETS.splice(ticketIndex, 1);
+    return true;
   }
 };

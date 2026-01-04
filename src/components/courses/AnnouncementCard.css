@@ -1,1 +1,3 @@
-/* AnnouncementCard styles */
+.announcement-avatar {
+  flex-shrink: 0;
+}

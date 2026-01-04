@@ -1,35 +1,63 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787/api';
+// src/services/api.service.ts
 
-export class ApiService {
-  private static getHeaders(): HeadersInit {
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
+// ⚠️ CHANGE THIS if your Java server runs on a different port
+const API_BASE_URL = 'http://localhost:8080/api'; 
+
+export const ApiService = {
+  // Generic request handler
+  request: async <T = any>(endpoint: string, options: RequestInit = {}): Promise<T> => {
+    // 1. Get the token from storage (if we are logged in)
     const token = localStorage.getItem('token');
+    
+    // FIX: Typed as Record<string, string> so we can add 'Authorization' later
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...(options.headers as any), // Merge custom headers
+    };
+
+    // 2. Attach token if it exists
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
-    return headers;
-  }
 
-  // CHANGE 'protected' TO 'public' HERE
-  public static async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-      ...options,
-      headers: {
-        ...this.getHeaders(),
-        ...options.headers,
-      },
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        ...options,
+        headers, // fetch accepts Record<string, string>
+      });
 
-    if (!response.ok) {
+      // 3. Handle "Unauthorized" (Token expired)
       if (response.status === 401) {
-        window.location.href = '/login';
+        localStorage.removeItem('token');
+        window.location.href = '/login'; // Force logout
+        throw new Error('Session expired');
       }
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `API Error: ${response.statusText}`);
-    }
 
-    return response.json();
-  }
-}
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+      }
+
+      // 4. Return the real data
+      return response.json();
+    } catch (error) {
+      console.error(`API Request Failed (${endpoint}):`, error);
+      throw error;
+    }
+  },
+
+  // Helper methods
+  get: <T>(endpoint: string) => ApiService.request<T>(endpoint, { method: 'GET' }),
+  
+  post: <T>(endpoint: string, body: any) => 
+    ApiService.request<T>(endpoint, { 
+      method: 'POST', 
+      body: JSON.stringify(body) 
+    }),
+    
+  put: <T>(endpoint: string, body: any) => 
+    ApiService.request<T>(endpoint, { 
+      method: 'PUT', 
+      body: JSON.stringify(body) 
+    }),
+};

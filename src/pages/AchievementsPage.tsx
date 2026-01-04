@@ -1,4 +1,4 @@
-import { Trophy, Star, Target } from 'lucide-react';
+import { Trophy, Star } from 'lucide-react';
 
 const AchievementsPage = () => {
   return (

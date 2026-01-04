@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MessageCircle, Send, CheckCircle, Lock } from 'lucide-react';
 
 const ResponseInterface = () => {

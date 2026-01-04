@@ -1,1 +1,5 @@
-/* Assignment styles */
+.assignment-status-badge {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.7rem;
+}

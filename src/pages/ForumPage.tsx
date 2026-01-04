@@ -1,4 +1,4 @@
-import { MessageCircle, ThumbsUp, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 const ForumPage = () => {
   return (

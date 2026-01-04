@@ -1,4 +1,4 @@
-import { Users, BookOpen, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { BookOpen, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const classPerformance = [

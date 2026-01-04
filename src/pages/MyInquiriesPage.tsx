@@ -2,7 +2,7 @@ import { useInquiryContext } from '@/contexts/InquiryContext';
 import { formatRelativeTime } from '@/utils/dateFormatter';
 
 const MyInquiriesPage = () => {
-  const { inquiries, loading } = useInquiryContext();
+  const { inquiries } = useInquiryContext();
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">

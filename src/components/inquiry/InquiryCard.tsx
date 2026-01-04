@@ -1,5 +1,4 @@
-import React from 'react';
-import { MessageSquare, User } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import SLAIndicator from './SLAIndicator';
 
 const InquiryCard = ({ inquiry }: any) => {

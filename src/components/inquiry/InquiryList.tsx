@@ -1,4 +1,3 @@
-import React from 'react';
 import InquiryCard from './InquiryCard';
 import { useInquiries } from '@/hooks/useInquiries'; // Import the hook
 import { Loader2, Inbox } from 'lucide-react';

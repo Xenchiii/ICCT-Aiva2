@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Calendar, MapPin, Users } from 'lucide-react';
+import { MapPin, Users } from 'lucide-react';
 
 const EventsPage = () => {
   const events = [

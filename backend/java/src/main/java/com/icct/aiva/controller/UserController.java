@@ -1,28 +1,33 @@
 package com.icct.aiva.controller;
 
-import com.icctaiva.repository.UserRepository;
-import com.icctaiva.model.User;
-import com.google.gson.Gson;
+import com.icct.aiva.model.User;
+import com.icct.aiva.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Optional;
 
+@RestController
+@RequestMapping("/api/user")
 public class UserController {
 
-    @SuppressWarnings("unused")
+    @Autowired
     private UserRepository userRepo;
-    private Gson gson;
 
-    public UserController() {
-        this.userRepo = new UserRepository();
-        this.gson = new Gson();
-    }
+    // 1. FIX: Removed 'new UserRepository()' because Spring creates it for us.
+    // 2. FIX: Removed 'new Gson()' because Spring handles JSON automatically.
 
-    // GET /api/user/profile
-    public String getProfile(String email) {
-        Optional<User> user = com.icctaiva.repository.UserRepository.User.findByEmail(email);
+    // GET /api/user/profile?email=student@test.com
+    @GetMapping("/profile")
+    public ResponseEntity<?> getProfile(@RequestParam String email) {
+        Optional<User> user = userRepo.findByEmail(email);
+
         if (user.isPresent()) {
-            return gson.toJson(user.get());
+            // Automatically converts the User object to JSON
+            return ResponseEntity.ok(user.get());
         } else {
-            return "{\"error\": \"User not found\"}";
+            return ResponseEntity.badRequest().body("{\"error\": \"User not found\"}");
         }
     }
 }

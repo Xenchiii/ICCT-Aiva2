@@ -1,31 +1,103 @@
-import { useAuth } from '@/hooks/useAuth';
-import { User, Mail, GraduationCap, Calendar } from 'lucide-react';
+import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 
-const ProfilePage = () => {
-  const { user } = useAuth(); //
+// FIX: Expanded User interface to include all fields used in ProfilePage
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: 'student' | 'admin' | 'faculty';
+  
+  // Optional fields for Profile Page
+  photoUrl?: string;
+  fullName?: string;
+  studentId?: string;
+  program?: string;
+  programCode?: string;
+  yearLevel?: number;
+  department?: string;
+}
+
+interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+  register: (userData: any) => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (error) {
+        console.error('Auth Check Error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
+    try {
+      if (email && password) {
+        // Mock User with ALL fields populated for testing
+        const mockUser: User = {
+          id: '1',
+          email,
+          firstName: 'Juan',
+          lastName: 'Dela Cruz',
+          fullName: 'Juan Dela Cruz',
+          role: 'student',
+          studentId: '2023-00123',
+          program: 'Bachelor of Science in Information Technology',
+          programCode: 'BSIT',
+          yearLevel: 3,
+          department: 'College of Computer Studies',
+          photoUrl: '' // Empty string will trigger the fallback avatar
+        };
+        setUser(mockUser);
+        localStorage.setItem('user', JSON.stringify(mockUser));
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+  };
+
+  const register = async (userData: any) => {
+    console.log('Registering:', userData);
+  };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm text-center">
-        <div className="w-24 h-24 bg-primary/10 rounded-full mx-auto mb-4 border-4 border-secondary overflow-hidden">
-          <img src={user?.photoUrl || `https://ui-avatars.com/api/?name=${user?.fullName}`} alt="Profile" />
-        </div>
-        <h1 className="text-2xl font-bold text-primary">{user?.fullName}</h1>
-        <p className="text-gray-400">{user?.id}</p>
-      </div>
-
-      <div className="bg-white rounded-xl border border-gray-100 divide-y divide-gray-50">
-        <div className="p-4 flex items-center gap-4">
-          <GraduationCap className="text-accent" />
-          <div><p className="text-xs text-gray-400">Course & Year</p><p className="font-medium">{user?.role} - {user?.programCode}</p></div>
-        </div>
-        <div className="p-4 flex items-center gap-4">
-          <Mail className="text-accent" />
-          <div><p className="text-xs text-gray-400">Email Address</p><p className="font-medium">{user?.email}</p></div>
-        </div>
-      </div>
-    </div>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout, register }}>
+      {children}
+    </AuthContext.Provider>
   );
 };
 
-export default ProfilePage;
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

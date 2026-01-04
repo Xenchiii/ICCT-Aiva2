@@ -1,41 +1,65 @@
-package com.icctaiva.security;
+package com.icct.aiva.security;
 
-public class JwtAuthenticationFilter {
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-    private JwtTokenProvider tokenProvider;
+import java.io.IOException;
 
-    public JwtAuthenticationFilter() {
-        this.tokenProvider = new JwtTokenProvider();
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private final JwtTokenProvider tokenProvider;
+    private final UserDetailsService userDetailsService;
+
+    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, UserDetailsService userDetailsService) {
+        this.tokenProvider = tokenProvider;
+        this.userDetailsService = userDetailsService;
     }
 
-    /**
-     * Simulates filtering an incoming request.
-     * @param authHeader The value of the "Authorization" header from the request.
-     * @param requestPath The URL path user is trying to access (e.g., "/api/grades")
-     * @return boolean True if access is allowed, False if denied.
-     */
-    public boolean doFilter(String authHeader, String requestPath) {
-        
-        // Public paths that don't need login
-        if (requestPath.equals("/api/auth/login") || requestPath.equals("/api/auth/register")) {
-            System.out.println("[FILTER] Public access allowed: " + requestPath);
-            return true;
+    @Override
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
+    ) throws ServletException, IOException {
+
+        final String authHeader = request.getHeader("Authorization");
+        final String jwt;
+        final String userEmail;
+
+        // 1. Check if token exists
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        // 1. Get the token from the header
-        String token = tokenProvider.resolveToken(authHeader);
+        jwt = authHeader.substring(7);
+        userEmail = tokenProvider.getUsernameFromJWT(jwt);
 
-        // 2. Validate the token
-        if (token != null && tokenProvider.validateToken(token)) {
-            String username = tokenProvider.getUsername(token);
-            System.out.println("[FILTER] Authenticated User: " + username + " accessing " + requestPath);
+        // 2. Validate token and set User in Context
+        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
             
-            // (Mock) Set authentication context here
-            return true;
+            if (tokenProvider.validateToken(jwt)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
         }
-
-        // 3. Deny access if validation fails
-        System.out.println("[FILTER] Access Denied: Unauthorized request to " + requestPath);
-        return false;
+        filterChain.doFilter(request, response);
     }
 }

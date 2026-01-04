@@ -1,4 +1,3 @@
-import React from 'react';
 import { TrendingUp, AlertTriangle, Target, Sparkles } from 'lucide-react';
 
 const PredictiveInsights = () => {

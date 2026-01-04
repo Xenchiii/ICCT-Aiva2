@@ -1,1 +1,4 @@
-/* Modules styles */
+/* Custom spacing for module containers */
+.module-container {
+  margin-bottom: 1.5rem;
+}

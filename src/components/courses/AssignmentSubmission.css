@@ -1,1 +1,31 @@
-/* AssignmentSubmission styles */
+/* Container styling */
+.submission-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* If you added className="upload-box" to your TSX div, 
+  this handles the hover animation 
+*/
+.upload-box {
+  border: 2px dashed #d1d5db; /* Gray-300 */
+  transition: all 0.3s ease;
+  background-color: white;
+}
+
+.upload-box:hover {
+  border-color: #003049; /* Primary Brand Color */
+  background-color: #f8fafc; /* Gray-50 */
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Animate the cloud icon inside when hovering */
+.upload-box:hover .upload-icon {
+  color: #003049;
+  transform: scale(1.1);
+}
+
+.upload-icon {
+  transition: transform 0.3s ease, color 0.3s ease;
+}

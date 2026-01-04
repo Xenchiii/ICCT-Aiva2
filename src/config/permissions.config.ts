@@ -39,6 +39,8 @@ export const PERMISSIONS = {
 } as const;
 
 export const hasPermission = (role: UserRole, permission: string): boolean => {
-  const rolePermissions = PERMISSIONS[role] || [];
-  return rolePermissions.includes(permission as any);
+  // FIX: Explicitly type this as 'readonly string[]' so TS allows .includes()
+  const rolePermissions: readonly string[] = PERMISSIONS[role] || [];
+  
+  return rolePermissions.includes(permission);
 };

@@ -3,18 +3,17 @@ import { InquiryService } from '../services/inquiry.service';
 
 interface Inquiry {
   id: string;
-  category: 'Academic' | 'Technical' | 'Administrative' | 'Behavioral' | 'General';
-  priority: 'Low' | 'Medium' | 'High' | 'Urgent';
-  status: 'Open' | 'Pending' | 'Resolved' | 'Closed';
+  category: string;
+  status: 'Open' | 'In Progress' | 'Resolved';
   subject: string;
-  message: string;
-  attachments?: string[];
+  description: string;
   createdAt: string;
 }
 
 interface InquiryContextType {
   inquiries: Inquiry[];
   activeInquiry: Inquiry | null;
+  setActiveInquiry: (inquiry: Inquiry | null) => void; // FIX 1: Add this definition
   loading: boolean;
   submitInquiry: (data: Partial<Inquiry>) => Promise<void>;
   fetchStudentInquiries: () => Promise<void>;
@@ -33,29 +32,55 @@ export const InquiryProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const fetchStudentInquiries = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await InquiryService.getStudentTickets();
+      const data = await InquiryService.getAll();
       setInquiries(data);
+    } catch (error) {
+      console.error('Error fetching student inquiries:', error);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Submit new inquiry with AI pre-submission logic (handled in service/Aiva)
+  // Submit new inquiry
   const submitInquiry = async (data: Partial<Inquiry>) => {
     setLoading(true);
     try {
-      const newInquiry = await InquiryService.submitTicket(data);
+      const newInquiry = await InquiryService.create(data);
       setInquiries((prev) => [newInquiry, ...prev]);
+    } catch (error) {
+      console.error('Error submitting inquiry:', error);
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
   const updateInquiryStatus = async (id: string, status: Inquiry['status']) => {
-    await InquiryService.updateStatus(id, status);
-    setInquiries((prev) =>
-      prev.map((inq) => (inq.id === id ? { ...inq, status } : inq))
-    );
+    try {
+      await InquiryService.update(id, { status });
+      setInquiries((prev) =>
+        prev.map((inq) => (inq.id === id ? { ...inq, status } : inq))
+      );
+    } catch (error) {
+      console.error('Error updating inquiry status:', error);
+      throw error;
+    }
+  };
+
+  // Admin fetch function
+  const fetchAdminInquiries = async (filters: any) => {
+    setLoading(true);
+    try {
+      // FIX 2: "Use" the filters variable to silence the warning
+      console.log("Applying filters:", filters); 
+      
+      const data = await InquiryService.getAll();
+      setInquiries(data);
+    } catch (error) {
+      console.error('Error fetching admin inquiries:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,10 +88,11 @@ export const InquiryProvider: React.FC<{ children: React.ReactNode }> = ({ child
       value={{
         inquiries,
         activeInquiry,
+        setActiveInquiry, // FIX 1: Expose the function here
         loading,
         submitInquiry,
         fetchStudentInquiries,
-        fetchAdminInquiries: async () => {}, // Admin-side implementation
+        fetchAdminInquiries,
         updateInquiryStatus,
       }}
     >

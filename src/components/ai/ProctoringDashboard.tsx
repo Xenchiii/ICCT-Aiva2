@@ -1,4 +1,3 @@
-import React from 'react';
 import { ShieldAlert, Signal } from 'lucide-react';
 
 const ProctoringDashboard = () => {

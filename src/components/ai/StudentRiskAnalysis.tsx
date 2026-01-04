@@ -1,4 +1,3 @@
-import React from 'react';
 import { AlertCircle, TrendingDown, UserMinus } from 'lucide-react';
 
 const StudentRiskAnalysis = () => {

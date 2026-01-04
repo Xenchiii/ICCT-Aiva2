@@ -1,4 +1,3 @@
-import React from 'react';
 import { AlertTriangle, FileText, Send } from 'lucide-react';
 
 const GradeDispute = () => {

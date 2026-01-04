@@ -1,6 +1,5 @@
-import React from 'react';
 import { useGrades } from '@/hooks/useGrades';
-import { formatDateTime } from '@/utils/dateFormatter';
+// FIX: Removed unused import 'formatDateTime'
 
 const GradesPage = () => {
   const { grades, gwa } = useGrades();
@@ -32,9 +31,13 @@ const GradesPage = () => {
             {grades.map((grade, idx) => (
               <tr key={idx} className="hover:bg-gray-50">
                 <td className="px-6 py-4 font-medium">{grade.courseCode}</td>
-                <td className="px-6 py-4">{grade.finalScore}%</td>
+                {/* Safe fallback in case finalScore is undefined */}
+                <td className="px-6 py-4">{grade.finalScore ?? 0}%</td>
                 <td className="px-6 py-4">{grade.units} Units</td>
-                <td className="px-6 py-4 text-right font-bold text-primary">1.25</td>
+                {/* Use the actual grade from data instead of hardcoded 1.25 */}
+                <td className="px-6 py-4 text-right font-bold text-primary">
+                  {grade.grade ? grade.grade.toFixed(2) : '0.00'}
+                </td>
               </tr>
             ))}
           </tbody>

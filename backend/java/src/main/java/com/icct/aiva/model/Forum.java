@@ -1,4 +1,4 @@
-package com.icctaiva.model;
+package com.icct.aiva.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,8 +6,10 @@ import java.util.List;
 public class Forum {
     private int postId;
     private String authorName;
+    @SuppressWarnings("unused")
     private String authorRole; // "Student" or "Professor"
     private String content;
+    @SuppressWarnings("unused")
     private String timestamp;
     private int likes;
     private List<String> comments; // Simple list of comments for now

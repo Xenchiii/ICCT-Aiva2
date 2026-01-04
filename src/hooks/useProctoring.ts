@@ -1,12 +1,18 @@
-// useProctoring.ts
+import { useState } from 'react';
+
 export const useProctoring = () => {
-  const [violations, setViolations] = useState(0);
+  const [violations, setViolations] = useState<number>(0);
 
   const startMonitoring = () => {
-    window.addEventListener('blur', () => {
-      setViolations(v => v + 1);
-      // Log tab switching to backend
-    });
+    const handleBlur = () => {
+      setViolations((v) => v + 1);
+    };
+
+    window.addEventListener('blur', handleBlur);
+
+    return () => {
+      window.removeEventListener('blur', handleBlur);
+    };
   };
 
   return { violations, startMonitoring };

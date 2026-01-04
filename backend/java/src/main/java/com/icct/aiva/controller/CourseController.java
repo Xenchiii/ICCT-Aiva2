@@ -1,35 +1,45 @@
 package com.icct.aiva.controller;
 
-// FIX: Updated imports to match your folder structure (added dot between icct and aiva)
-import com.icct.aiva.service.CourseService;
 import com.icct.aiva.model.Course;
+import com.icct.aiva.service.CourseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-// FIX: Make sure you have the Gson library added to your project dependencies
-import com.google.gson.Gson; 
 import java.util.List;
+import java.util.Map;
 
+@RestController
+@RequestMapping("/api/courses")
 public class CourseController {
 
+    @Autowired
     private CourseService courseService;
-    private Gson gson;
-
-    public CourseController() {
-        this.courseService = new CourseService();
-        this.gson = new Gson();
-    }
 
     // GET /api/courses
-    public String getAllCourses() {
+    // Spring automatically converts the List<Course> to JSON for you!
+    @GetMapping
+    public ResponseEntity<List<Course>> getAllCourses() {
         // Hardcoded student ID for demo purposes
         List<Course> courses = courseService.getStudentCourses("2023-01025"); 
-        return gson.toJson(courses);
+        return ResponseEntity.ok(courses);
     }
 
     // POST /api/courses/enroll
-    public String enroll(String requestBody) {
-        Course request = gson.fromJson(requestBody, Course.class);
-        boolean success = courseService.enrollStudent("2023-01025", request.getCourseCode(), request.getDescription());
+    // @RequestBody automatically converts the incoming JSON to a Course object
+    @PostMapping("/enroll")
+    public ResponseEntity<?> enroll(@RequestBody Course request) {
+        boolean success = courseService.enrollStudent(
+            "2023-01025", 
+            request.getCourseCode(), 
+            request.getDescription()
+        );
         
-        return success ? "{\"message\": \"Enrollment Successful\"}" : "{\"message\": \"Enrollment Failed\"}";
+        if (success) {
+            // Return a simple JSON success message
+            return ResponseEntity.ok(Map.of("message", "Enrollment Successful"));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("message", "Enrollment Failed"));
+        }
     }
 }

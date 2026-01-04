@@ -1,5 +1,6 @@
 import { ApiService } from './api.service';
 
+// 1. Export the Interface
 export interface Notification {
   id: string;
   title: string;
@@ -9,22 +10,23 @@ export interface Notification {
   timestamp: string;
 }
 
+// 2. Export the Service Object
 export const NotificationService = {
-  // Get all notifications for the logged-in student
+  // Get all notifications
   getAll: () => ApiService.request<Notification[]>('/notifications'),
 
-  // Get only unread count for the navbar badge
+  // Get unread count
   getUnreadCount: () => ApiService.request<{ count: number }>('/notifications/unread-count'),
 
-  // Mark a specific notification as read
+  // Mark specific as read
   markAsRead: (id: string) => 
     ApiService.request(`/notifications/${id}/read`, { method: 'PATCH' }),
 
-  // Clear all notifications
+  // Mark all as read
   markAllAsRead: () => 
     ApiService.request('/notifications/read-all', { method: 'PATCH' }),
 
-  // Delete a notification
+  // Delete notification
   delete: (id: string) => 
     ApiService.request(`/notifications/${id}`, { method: 'DELETE' }),
 };

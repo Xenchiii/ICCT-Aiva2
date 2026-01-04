@@ -6,10 +6,15 @@ const HomePage = () => {
   const { user } = useAuth();
   const { gwa } = useGrades();
 
+  // FIX: Safely determine the display name regardless of which 'User' type you have
+  // This checks for fullName, then name, then combines firstName + lastName
+  const displayName = (user as any)?.fullName || (user as any)?.name || `${user?.firstName} ${user?.lastName}`;
+
   return (
     <div className="space-y-6 animate-fade-in">
       <header className="bg-primary p-8 rounded-2xl text-white shadow-lg">
-        <h1 className="text-3xl font-bold">Welcome back, {user?.fullName}!</h1>
+        {/* FIX: Use the calculated displayName */}
+        <h1 className="text-3xl font-bold">Welcome back, {displayName}!</h1>
         <p className="opacity-80 mt-2">You currently have a GWA of {gwa}. Keep up the great work!</p>
       </header>
 

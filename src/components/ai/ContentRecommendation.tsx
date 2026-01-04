@@ -1,4 +1,4 @@
-import { BookOpen, Video, ArrowRight, BrainCircuit } from 'lucide-react';
+import { BookOpen, Video, ArrowRight, BrainCircuit, Sparkles } from 'lucide-react';
 
 const ContentRecommendation = () => {
   // Hardcoded recommendations based on a "mock" low score in React

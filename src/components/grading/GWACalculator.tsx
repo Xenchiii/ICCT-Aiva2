@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Plus, RefreshCcw, Trophy } from 'lucide-react';
 
 const GWACalculator = () => {

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Save, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Save } from 'lucide-react';
 
 const GradeComponentConfig = () => {
   const [components, setComponents] = useState([

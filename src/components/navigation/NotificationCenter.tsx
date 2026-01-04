@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './NotificationCenter.css';
-import { Bell, Check } from 'lucide-react';
+import { Bell } from 'lucide-react';
 
 const NotificationCenter = () => {
   const [isOpen, setIsOpen] = useState(false);

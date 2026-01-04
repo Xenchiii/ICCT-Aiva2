@@ -1,4 +1,3 @@
-import React from 'react';
 import InquiryTimeline from './InquiryTimeline';
 import ResponseInterface from './ResponseInterface';
 import { ArrowLeft, User, Calendar } from 'lucide-react';

@@ -1,4 +1,3 @@
-import React from 'react';
 import GradeDistributionChart from './GradeDistributionChart';
 import { TrendingUp, AlertTriangle, Users } from 'lucide-react';
 

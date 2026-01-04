@@ -1,27 +1,34 @@
-import React from 'react';
-import { 
-  TrendingUp, Clock, AlertCircle, 
-  CheckCircle2, BrainCircuit, Calendar 
-} from 'lucide-react';
-import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, 
-  Tooltip, ResponsiveContainer, AreaChart, Area 
-} from 'recharts';
-import { useGrades } from '@/hooks/useGrades';
-import { useAuth } from '@/hooks/useAuth';
+import { useEffect } from 'react';
+import { TrendingUp, Clock, AlertCircle, CheckCircle2, BrainCircuit, Calendar } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line } from 'recharts';
+import { useNavigate } from 'react-router-dom';
+import { useGrades, Grade } from '@/hooks/useGrades';
 
-// Mock data for the complex Trend Analysis
 const performanceData = [
   { week: 'W1', grade: 1.75, predicted: 1.75 },
   { week: 'W2', grade: 1.50, predicted: 1.55 },
   { week: 'W3', grade: 1.75, predicted: 1.60 },
   { week: 'W4', grade: 1.25, predicted: 1.40 },
-  { week: 'W5', grade: null, predicted: 1.35 }, // Predicted future trend
+  { week: 'W5', grade: null, predicted: 1.35 },
+];
+
+// Mock grades data
+const MOCK_GRADES: Grade[] = [
+  { id: '1', courseCode: 'IT 302', courseName: 'Web Development', grade: 1.25, units: 3, semester: 'First', academicYear: '2025-2026' },
+  { id: '2', courseCode: 'CS 201', courseName: 'Data Structures', grade: 1.50, units: 3, semester: 'First', academicYear: '2025-2026' },
+  { id: '3', courseCode: 'MATH 101', courseName: 'Calculus', grade: 1.75, units: 3, semester: 'First', academicYear: '2025-2026' },
+  { id: '4', courseCode: 'ENG 102', courseName: 'Technical Writing', grade: 1.00, units: 3, semester: 'First', academicYear: '2025-2026' }
 ];
 
 const StudentDashboard = () => {
-  const { user } = useAuth();
-  const { grades, gwa } = useGrades();
+  const navigate = useNavigate();
+  const { grades, setGrades, gwa } = useGrades();
+
+  useEffect(() => {
+    if (grades.length === 0) {
+      setGrades(MOCK_GRADES);
+    }
+  }, [grades.length, setGrades]);
 
   return (
     <div className="space-y-6 animate-fade-in p-2">
@@ -61,14 +68,17 @@ const StudentDashboard = () => {
             <p className="text-sm opacity-80 mt-2 max-w-[80%]">
               Based on your current activity in <b>IT 302</b>, you are projected to reach a <b>1.25</b> grade if you maintain your 90% submission rate.
             </p>
-            <button className="mt-4 text-xs font-bold text-secondary border border-secondary/30 px-4 py-2 rounded-lg hover:bg-secondary hover:text-primary transition">
+            <button 
+              onClick={() => navigate('/study-plan')}
+              className="mt-4 text-xs font-bold text-secondary border border-secondary/30 px-4 py-2 rounded-lg hover:bg-secondary hover:text-primary transition"
+            >
               View Detailed Study Plan
             </button>
           </div>
         </div>
       </div>
 
-      {/* Middle Layer: Data Visualization */}
+      {/* Middle Layer */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
           <div className="flex justify-between items-center mb-6">
@@ -90,9 +100,7 @@ const StudentDashboard = () => {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
                 <XAxis dataKey="week" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#9ca3af'}} />
                 <YAxis reversed domain={[1.0, 5.0]} axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#9ca3af'}} />
-                <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                />
+                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
                 <Area type="monotone" dataKey="grade" stroke="#003049" strokeWidth={3} fillOpacity={1} fill="url(#colorGrade)" />
                 <Line type="monotone" dataKey="predicted" stroke="#93c5fd" strokeDasharray="5 5" />
               </AreaChart>
@@ -100,7 +108,6 @@ const StudentDashboard = () => {
           </div>
         </div>
 
-        {/* Right: Task Prioritization */}
         <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
           <h3 className="font-bold text-primary mb-4 flex items-center gap-2">
             <Calendar size={18} /> Priority Deadlines
@@ -117,13 +124,13 @@ const StudentDashboard = () => {
               <p className="text-xs text-gray-500">10:00 AM • Room 302</p>
             </div>
           </div>
-          <button className="w-full mt-6 py-2 text-sm font-bold text-primary border-2 border-gray-50 rounded-xl hover:bg-gray-50 transition">
+          <button onClick={() => navigate('/tasks')} className="w-full mt-6 py-2 text-sm font-bold text-primary border-2 border-gray-50 rounded-xl hover:bg-gray-50 transition">
             View All Tasks
           </button>
         </div>
       </div>
 
-      {/* Bottom Layer: Subject Status Table */}
+      {/* Bottom Layer */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="p-6 border-b border-gray-50 flex justify-between items-center">
           <h3 className="font-bold text-primary">Subject Performance Breakdown</h3>
@@ -140,29 +147,33 @@ const StudentDashboard = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {grades.map((grade, idx) => (
-              <tr key={idx} className="hover:bg-gray-50/50 transition">
-                <td className="px-6 py-4">
-                  <div className="font-bold text-primary">{grade.courseCode}</div>
-                  <div className="text-[10px] text-gray-400">3.0 Units</div>
-                </td>
-                <td className="px-6 py-4 text-gray-600">Prof. Cruz</td>
-                <td className="px-6 py-4">
-                   <div className="flex items-center gap-2">
-                     <div className="w-16 bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                        <div className="bg-primary h-1.5 rounded-full" style={{ width: `${grade.finalScore}%` }}></div>
-                     </div>
-                     <span className="font-bold">{grade.finalScore}%</span>
-                   </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span className="flex items-center gap-1 text-green-600 font-bold text-[10px]">
-                    <CheckCircle2 size={12} /> ON TRACK
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-right font-black text-primary">1.25</td>
-              </tr>
-            ))}
+            {grades.map((grade, idx) => {
+              const safeGrade = grade.grade || 5.0;
+              const percentage = Math.round(100 - ((safeGrade - 1.0) * 10));
+              return (
+                <tr key={grade.id || idx} className="hover:bg-gray-50/50 transition">
+                  <td className="px-6 py-4">
+                    <div className="font-bold text-primary">{grade.courseCode}</div>
+                    <div className="text-[10px] text-gray-400">{grade.units} Units</div>
+                  </td>
+                  <td className="px-6 py-4 text-gray-600">{grade.courseName || 'Prof. Cruz'}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                        <div className="bg-primary h-1.5 rounded-full" style={{ width: `${percentage}%` }}></div>
+                      </div>
+                      <span className="font-bold">{percentage}%</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="flex items-center gap-1 text-green-600 font-bold text-[10px]">
+                      <CheckCircle2 size={12} /> ON TRACK
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right font-black text-primary">{safeGrade.toFixed(2)}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

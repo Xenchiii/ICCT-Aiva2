@@ -1,0 +1,50 @@
+<svg viewBox="0 0 240 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gradient Definitions -->
+  <defs>
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Icon Circle Background -->
+  <circle cx="30" cy="30" r="26" fill="url(#primaryGradient)" opacity="0.15"/>
+  
+  <!-- AI Brain Icon -->
+  <g transform="translate(30, 30)">
+    <!-- Center node -->
+    <circle cx="0" cy="0" r="4" fill="url(#accentGradient)"/>
+    
+    <!-- Neural connections -->
+    <line x1="0" y1="0" x2="-10" y2="-8" stroke="url(#primaryGradient)" stroke-width="1.5" opacity="0.7"/>
+    <line x1="0" y1="0" x2="10" y2="-8" stroke="url(#primaryGradient)" stroke-width="1.5" opacity="0.7"/>
+    <line x1="0" y1="0" x2="-12" y2="6" stroke="url(#primaryGradient)" stroke-width="1.5" opacity="0.7"/>
+    <line x1="0" y1="0" x2="12" y2="6" stroke="url(#primaryGradient)" stroke-width="1.5" opacity="0.7"/>
+    
+    <!-- Outer nodes -->
+    <circle cx="-10" cy="-8" r="3" fill="#06b6d4"/>
+    <circle cx="10" cy="-8" r="3" fill="#06b6d4"/>
+    <circle cx="-12" cy="6" r="3" fill="#8b5cf6"/>
+    <circle cx="12" cy="6" r="3" fill="#8b5cf6"/>
+    
+    <!-- Book element at bottom -->
+    <path d="M -8 10 L -8 16 L -1 16 L -1 10" fill="none" stroke="url(#primaryGradient)" stroke-width="1.5"/>
+    <path d="M 1 10 L 1 16 L 8 16 L 8 10" fill="none" stroke="url(#accentGradient)" stroke-width="1.5"/>
+    <line x1="-1" y1="10" x2="1" y2="10" stroke="#4f46e5" stroke-width="1.5"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="65" y="28" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="22" font-weight="700" fill="#1e293b">
+    ICCT-Aiva
+  </text>
+  <text x="65" y="44" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="9" font-weight="500" fill="#64748b" letter-spacing="0.5">
+    AI VIRTUAL ASSISTANT
+  </text>
+  
+  <!-- Accent sparkle -->
+  <path d="M 220 20 L 221.5 23 L 224.5 24.5 L 221.5 26 L 220 29 L 218.5 26 L 215.5 24.5 L 218.5 23 Z" fill="#06b6d4" opacity="0.6"/>
+</svg>

@@ -1,42 +1,96 @@
 package com.icct.aiva.config;
 
-import java.util.ArrayList;
+import com.icct.aiva.security.JwtAuthenticationFilter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import java.util.List;
 
+@Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
-    // List of paths that do not require an Auth Token
-    private static final List<String> PUBLIC_URLS = new ArrayList<>();
+    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final UserDetailsService userDetailsService;
 
-    static {
-        PUBLIC_URLS.add("/api/auth/login");
-        PUBLIC_URLS.add("/api/auth/register");
-        PUBLIC_URLS.add("/api/status"); // Health check
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, UserDetailsService userDetailsService) {
+        this.jwtAuthFilter = jwtAuthFilter;
+        this.userDetailsService = userDetailsService;
     }
 
-    /**
-     * Checks if the requested path is public.
-     */
-    public boolean isPublicEndpoint(String path) {
-        return PUBLIC_URLS.contains(path);
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            // 1. Disable CSRF (Common for React+Spring APIs)
+            .csrf(csrf -> csrf.disable())
+            
+            // 2. Enable CORS (Allow React to talk to Java)
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            
+            // 3. Define Roles and Permissions (RBAC)
+            .authorizeHttpRequests(auth -> auth
+                // Allow everyone to access Login/Register
+                .requestMatchers("/api/auth/**").permitAll()
+                // Only allow specific roles for specific endpoints (Optional/Future)
+                // .requestMatchers("/api/admin/**").hasAuthority("ADMIN") 
+                // .requestMatchers("/api/student/**").hasAuthority("STUDENT")
+                // Block everything else unless logged in
+                .anyRequest().authenticated()
+            )
+            
+            // 4. No Sessions (Because we use JWT)
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            
+            // 5. Add our Custom JWT Filter
+            .authenticationProvider(authenticationProvider())
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
 
-    /**
-     * Simulates Role-Based Access Control (RBAC).
-     * e.g., Students shouldn't access /admin paths.
-     */
-    public boolean isAccessAllowed(String userRole, String path) {
-        // Admins can go anywhere
-        if ("Admin".equalsIgnoreCase(userRole)) {
-            return true;
-        }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Allow React Frontend
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowCredentials(true);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
-        // Students cannot access admin endpoints
-        if ("Student".equalsIgnoreCase(userRole) && path.startsWith("/api/admin")) {
-            System.out.println("[SECURITY] Access Denied: Student attempted to access Admin area.");
-            return false;
-        }
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
 
-        return true;
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

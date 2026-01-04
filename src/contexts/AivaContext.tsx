@@ -1,8 +1,5 @@
-'use client';
-
-import { usePathname } from 'next/navigation'; // Detect current page
-import React, { createContext, useState } from 'react';
-import { AiService } from '../services/ai.service';
+import React, { createContext, useState, useContext } from 'react';
+import { AiService } from '../services/ai.service'; // Ensure this matches your filename
 
 interface Message {
   role: 'user' | 'assistant';
@@ -18,7 +15,7 @@ interface AivaContextType {
   toggleChat: () => void;
 }
 
-const AivaContext = createContext<AivaContextType | undefined>(undefined);
+export const AivaContext = createContext<AivaContextType | undefined>(undefined);
 
 export const AivaProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [messages, setMessages] = useState<Message[]>([
@@ -26,25 +23,31 @@ export const AivaProvider: React.FC<{ children: React.ReactNode }> = ({ children
   ]);
   const [isOpen, setIsOpen] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
-  const pathname = usePathname(); // e.g., "/courses/CS101"
 
   const askAiva = async (question: string) => {
-    // Optimistic Update
+    // 1. Optimistic UI Update (Show user message immediately)
     const userMsg: Message = { role: 'user', content: question, timestamp: new Date() };
     setMessages(prev => [...prev, userMsg]);
     setIsThinking(true);
 
     try {
-      // Send the current page context (pathname) to the AI
-      const response = await AiService.askTutor({
-        question,
-        context: { page: pathname } 
-      });
+      // FIX: AiService.askTutor expects a string, not an object.
+      // We removed the 'context' object because the service definition doesn't support it yet.
+      const response = await AiService.askTutor(question);
 
-      const aiMsg: Message = { role: 'assistant', content: response.answer, timestamp: new Date() };
+      // FIX: Ensure we handle the response format correctly
+      // If response is just { answer: "..." }, use it.
+      const answerText = response.answer || "I received your message but got no text back.";
+
+      const aiMsg: Message = { role: 'assistant', content: answerText, timestamp: new Date() };
       setMessages(prev => [...prev, aiMsg]);
     } catch (err) {
-      setMessages(prev => [...prev, { role: 'assistant', content: "I'm having trouble connecting to the server.", timestamp: new Date() }]);
+      console.error(err);
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: "I'm having trouble connecting to the Aiva server.", 
+        timestamp: new Date() 
+      }]);
     } finally {
       setIsThinking(false);
     }
@@ -55,4 +58,13 @@ export const AivaProvider: React.FC<{ children: React.ReactNode }> = ({ children
       {children}
     </AivaContext.Provider>
   );
+};
+
+// Custom Hook
+export const useAiva = () => {
+  const context = useContext(AivaContext);
+  if (context === undefined) {
+    throw new Error('useAiva must be used within an AivaProvider');
+  }
+  return context;
 };

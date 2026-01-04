@@ -1,4 +1,3 @@
-import React from 'react';
 import { CheckCircle2, Clock, MessageSquare, UserCheck } from 'lucide-react';
 
 const InquiryTimeline = ({ status = 'Open' }) => {

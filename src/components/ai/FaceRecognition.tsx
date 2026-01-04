@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Camera, ShieldCheck, XCircle, RefreshCw } from 'lucide-react';
 
 const FaceRecognition = () => {
