@@ -1,0 +1,100 @@
+.captcha-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Reduced gap */
+    width: 100%;
+    margin-bottom: 16px; /* Reduced margin */
+    background: #f9fafb;
+    padding: 10px 12px; /* Tighter padding */
+    border-radius: 12px; /* Slightly smaller radius to match scale */
+    border: 1px solid #e5e7eb;
+}
+
+.captcha-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.captcha-header label {
+    font-size: 0.75rem; /* Smaller label */
+    color: #4b5563;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.refresh-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    color: #6366f1;
+    cursor: pointer;
+    font-size: 0.75rem; /* Smaller button text */
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.refresh-btn:hover {
+    background-color: #e0e7ff;
+    color: #4f46e5;
+}
+
+/* KEY CHANGE: Reduced height from 50px to 38px */
+.captcha-wrapper {
+    display: flex;
+    gap: 8px;
+    height: 38px; 
+}
+
+.captcha-display {
+    flex: 1;
+    background: white;
+    background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+    background-size: 8px 8px; /* Tighter pattern */
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem; /* Smaller code font */
+    font-weight: 800;
+    color: #374151;
+    letter-spacing: 3px; /* Tighter spacing */
+    user-select: none;
+    overflow: hidden;
+    text-decoration: line-through;
+    text-decoration-color: rgba(99, 102, 241, 0.4);
+}
+
+.captcha-input {
+    flex: 1;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0 10px;
+    font-size: 0.9rem; /* Smaller input font */
+    outline: none;
+    color: #1f2937;
+    text-align: center;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+}
+
+.captcha-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.captcha-input::placeholder {
+    text-transform: none;
+    letter-spacing: normal;
+    font-size: 0.8rem;
+    color: #9ca3af;
+}

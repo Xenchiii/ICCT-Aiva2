@@ -7,14 +7,9 @@ import { InquiryProvider } from './contexts/InquiryContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { AivaProvider } from './contexts/AivaContext';
 
-// Auth Components
-import ProtectedRoute from './components/auth/ProtectedRoute';
-
-// Pages - Auth
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-
-// Pages - Dashboards
+// --- AUTH IMPORTS (CONSOLIDATED) ---
+// We remove the old ProtectedRoute import and get everything from AuthPage
+import AuthPage, { ForgotPassword, ResetPassword, ProtectedRoute } from './pages/AuthPage';
 import AdminDashboard from './pages/dashboards/AdminDashboard';
 import StudentDashboard from './pages/dashboards/StudentDashboard';
 import ProfessorDashboard from './pages/dashboards/ProfessorDashboard';
@@ -62,8 +57,12 @@ function App() {
                       <Routes>
                         {/* Public Routes */}
                         <Route path="/" element={<HomePage />} />
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/register" element={<RegisterPage />} />
+                        
+                        {/* Auth Routes */}
+                        <Route path="/login" element={<AuthPage initialMode="login" />} />
+                        <Route path="/register" element={<AuthPage initialMode="register" />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/reset-password" element={<ResetPassword />} />
 
                         {/* Protected Dashboard Routes */}
                         <Route
@@ -202,7 +201,7 @@ function App() {
                         <Route path="*" element={<Navigate to="/404" replace />} />
                       </Routes>
 
-                      {/* Global AI Assistant - Available on all pages */}
+                      {/* Global AI Assistant */}
                       <AivaFloatingButton />
                     </div>
                   </AivaProvider>
